@@ -1,0 +1,13 @@
+.noBtn {
+    -fx-background-color: #CD3C14;
+    -fx-text-fill: white;
+}
+
+.yesBtn {
+    -fx-background-color: #32C832;
+    -fx-text-fill: black;
+}
+
+.root {
+    -fx-background-color: white;
+}

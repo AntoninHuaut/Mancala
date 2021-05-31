@@ -1,0 +1,53 @@
+.button {
+    -fx-background-color: #0D6EFD;
+    -fx-background-radius: 2.5;
+    -fx-text-fill: white;
+}
+
+.button:hover {
+    -fx-background-color: #0B5ED7;
+    -fx-border-color: #0B5ED7;
+    -fx-text-fill: white;
+}
+
+.button:pressed {
+    -fx-background-color: #0B5CD2;
+    -fx-border-color: #0B5CD2;
+    -fx-text-fill: white;
+}
+
+.button.secondary {
+    -fx-background-color: #F8F9FA;
+    -fx-border-color: #F8F9FA;
+    -fx-text-fill: black;
+}
+
+.button.secondary:hover {
+    -fx-background-color: #F9FAFB;
+    -fx-border-color: #F9FAFB;
+    -fx-text-fill: black;
+}
+
+.button.secondary:pressed {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #FFFFFF;
+    -fx-text-fill: black;
+}
+
+.button.success {
+    -fx-background-color: #198754;
+    -fx-border-color: #198754;
+    -fx-text-fill: white;
+}
+
+.button.success:hover {
+    -fx-background-color: #157347;
+    -fx-border-color: #157347;
+    -fx-text-fill: white;
+}
+
+.button.success:pressed {
+    -fx-background-color: #146C43;
+    -fx-border-color: #146C43;
+    -fx-text-fill: white;
+}

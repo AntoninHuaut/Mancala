@@ -1,0 +1,31 @@
+.button {
+    -fx-background-color: #0D6EFD;
+    -fx-background-radius: 5;
+    -fx-text-fill: white;
+}
+
+.button:hover {
+    -fx-background-color: #FFA555;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-scale-z: 1.05;
+}
+
+.button:pressed {
+    -fx-background-color: #0D6EFD;
+}
+
+.separator *.line {
+    -fx-background-color: #FFA555;
+    -fx-border-color: #FFA555;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+}
+
+.tab-pane {
+    -fx-tab-max-height: 0;
+}
+
+.tab-pane .tab-header-area {
+    visibility: hidden;
+}

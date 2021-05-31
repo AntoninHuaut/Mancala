@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="anchorPane" prefHeight="35.0" prefWidth="600.0" style="-fx-background-color: #1D8AFF;" stylesheets="@../GlobalRoot.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <HBox alignment="CENTER" spacing="15.0">
+                    <children>
+                          <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                              <image>
+                                  <Image url="@../../img/logo.png" />
+                              </image>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                          </ImageView>
+                  <Label alignment="CENTER" contentDisplay="CENTER" text="%window.title" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font name="Helvetica 75 Bold" size="20.0" />
+                     </font>
+                  </Label>
+                    </children>
+               <HBox.margin>
+                  <Insets left="1.0" />
+               </HBox.margin>
+                </HBox>
+                <Region prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                    <children>
+                        <ImageView fx:id="reduceImg" fitHeight="30.0" fitWidth="30.0" onMouseClicked="#reduceApp" pickOnBounds="true" preserveRatio="true" styleClass="clickable">
+                            <image>
+                                <Image url="@../../img/toolbar/reduce.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="exitImg" fitHeight="30.0" fitWidth="30.0" onMouseClicked="#exitApp" pickOnBounds="true" preserveRatio="true" styleClass="clickable">
+                            <image>
+                                <Image url="@../../img/toolbar/close.png" />
+                            </image>
+                        </ImageView>
+                    </children>
+                    <padding>
+                        <Insets right="5.0" />
+                    </padding>
+                </HBox>
+            </children>
+        </HBox>
+    </children>
+</AnchorPane>

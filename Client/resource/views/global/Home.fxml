@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="container" prefHeight="600.0" prefWidth="300.0" style="-fx-background-color: #1D8AFF;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+      <VBox alignment="TOP_CENTER" prefHeight="175.0" prefWidth="300.0" spacing="15.0">
+         <children>
+              <Pane minHeight="130.0" prefHeight="130.0" prefWidth="300.0">
+                  <children>
+                      <Label alignment="CENTER" layoutY="104.0" prefHeight="28.0" prefWidth="300.0" text="TODO Home menu" textFill="WHITE">
+                          <font>
+                              <Font size="19.0" />
+                          </font>
+                      </Label>
+                  </children>
+              </Pane>
+         </children>
+      </VBox>
+    </children>
+</VBox>
