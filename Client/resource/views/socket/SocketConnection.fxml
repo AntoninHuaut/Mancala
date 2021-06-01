@@ -51,34 +51,56 @@
                      <children>
                         <VBox alignment="CENTER" prefWidth="700.0" spacing="30.0">
                            <children>
-                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="400.0">
+                              <HBox prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <Label text="%socket.socketconnection.form">
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                    </Label>
-                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0" spacing="10.0">
+                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="400.0">
                                        <children>
-                                          <MFXTextField fx:id="hostField" lineColor="#0d6efd" lineStrokeWidth="1.5" minHeight="40.0" minWidth="200.0" promptText="%socket.socketconnection.form.host.prompt">
+                                          <Label text="%socket.username.form">
                                              <font>
                                                 <Font size="16.0" />
-                                             </font>
-                                          </MFXTextField>
-                                          <Label minWidth="5.0" text=":">
-                                             <font>
-                                                <Font size="20.0" />
                                              </font>
                                           </Label>
-                                          <MFXTextField fx:id="portField" lineColor="#0d6efd" lineStrokeWidth="1.5" minHeight="40.0" minWidth="50.0" prefWidth="60.0" promptText="%socket.socketconnection.form.port.prompt">
+                                          <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                                             <children>
+                                                <MFXTextField fx:id="usernameField" lineColor="#0d6efd" lineStrokeWidth="1.5" minHeight="40.0" minWidth="200.0" promptText="%socket.username.form.prompt">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </MFXTextField>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="400.0">
+                                       <children>
+                                          <Label text="%socket.socketconnection.form">
                                              <font>
                                                 <Font size="16.0" />
                                              </font>
-                                          </MFXTextField>
+                                          </Label>
+                                          <HBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0" spacing="10.0">
+                                             <children>
+                                                <MFXTextField fx:id="hostField" lineColor="#0d6efd" lineStrokeWidth="1.5" minHeight="40.0" minWidth="200.0" promptText="%socket.socketconnection.form.host.prompt">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </MFXTextField>
+                                                <Label minWidth="5.0" text=":">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Label>
+                                                <MFXTextField fx:id="portField" lineColor="#0d6efd" lineStrokeWidth="1.5" minHeight="40.0" minWidth="50.0" prefWidth="60.0" promptText="%socket.socketconnection.form.port.prompt">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </MFXTextField>
+                                             </children>
+                                          </HBox>
                                        </children>
-                                    </HBox>
+                                    </VBox>
                                  </children>
-                              </VBox>
+                              </HBox>
                               <MFXButton fx:id="connectBtn" buttonType="RAISED" onAction="#tryConnection" styleClass="success" text="%socket.socketconnection.form.connect" textFill="WHITE">
                                  <font>
                                     <Font size="18.0" />

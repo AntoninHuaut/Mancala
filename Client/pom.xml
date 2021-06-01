@@ -15,7 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <main.class>fr.antoninhuaut.projet.AppFX</main.class>
+        <main.class>fr.antoninhuaut.mancala.AppFX</main.class>
     </properties>
 
     <dependencies>
