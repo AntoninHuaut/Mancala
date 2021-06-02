@@ -1,5 +1,8 @@
 package fr.antoninhuaut.mancala.model;
 
+import fr.antoninhuaut.mancala.match.Game;
+import fr.antoninhuaut.mancala.match.Round;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -129,7 +132,7 @@ public class Player implements Runnable {
     }
 
     public int getPlayerId() {
-        return isPlayerOne ? 1 : 2;
+        return isPlayerOne ? 0 : 1;
     }
 
     public String getUsername() {

@@ -1,4 +1,6 @@
-package fr.antoninhuaut.mancala.model;
+package fr.antoninhuaut.mancala.match;
+
+import fr.antoninhuaut.mancala.model.Player;
 
 public class Game {
 

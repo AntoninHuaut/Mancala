@@ -1,4 +1,9 @@
-package fr.antoninhuaut.mancala.model;
+package fr.antoninhuaut.mancala.match;
+
+import fr.antoninhuaut.mancala.model.Cell;
+import fr.antoninhuaut.mancala.model.Move;
+import fr.antoninhuaut.mancala.model.MoveEnum;
+import fr.antoninhuaut.mancala.model.Player;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -13,14 +18,22 @@ public class Round {
     private final Cell[][] cells;
 
     private Player currentPlayer;
+    private Move lastMove;
 
     public Round(Game game) {
         this.game = game;
         this.cells = new Cell[NB_LINE][NB_COL];
+//        for (int line = 0; line < NB_LINE; ++line) {
+//            for (int col = 0; col < NB_COL; ++col) {
+//                cells[line][col] = new Cell(null, 4);
+//            }
+//        }
 
+        // TODO DEBUG
         for (int line = 0; line < NB_LINE; ++line) {
             for (int col = 0; col < NB_COL; ++col) {
-                cells[line][col] = new Cell(null, 4);
+                int value = line == 0 ? 0 : 4;
+                cells[line][col] = new Cell(null, value);
             }
         }
     }
@@ -48,11 +61,17 @@ public class Round {
             throw new IllegalStateException("NOT_YOUR_CELL");
         }
 
-        playMove(cellPlayed, linePlayed, colPlayed);
+        lastMove = new Move(this, cells, currentPlayer);
+        MoveEnum moveEnum = lastMove.doMove(linePlayed, colPlayed);
+        System.out.println(moveEnum);
+        if (!moveEnum.isSuccess()) {
+            // TODO message client
+            return;
+        }
 
         for (Player pLoop : Arrays.asList(currentPlayer, game.getOppositePlayer(currentPlayer))) {
             pLoop.sendGameUpdate(cells, game.getPOne().getCurrentScore(), game.getPTwo().getCurrentScore());
-            pLoop.sendData("MESSAGE SWITCH_TURN");
+            pLoop.sendData("MESSAGE SWITCH_TURN"); // TODO précisez quel joueur au cas où
         }
 
         Optional<Player> optWinner = getWinner();
@@ -66,53 +85,12 @@ public class Round {
         this.currentPlayer = game.getOppositePlayer(currentPlayer);
     }
 
-    private synchronized void playMove(Cell cellPlayed, int linePlayed, int colPlayed) {
-        int nbSeed = cellPlayed.getNbSeed();
-        cellPlayed.clearSeed();
-
-        int line = linePlayed;
-        int col = colPlayed;
-        while (nbSeed > 0) {
-            do {
-                if (line == 0) {
-                    if (col > 0) {
-                        --col;
-                    } else {
-                        line = 1;
-                    }
-                } else {
-                    if (col < NB_COL - 1) {
-                        ++col;
-                    } else {
-                        line = 0;
-                    }
-                }
-            } while (line == linePlayed && col == colPlayed);
-
-            cells[line][col].addSeed();
-            --nbSeed;
-        }
-
-        if (line != linePlayed) { // Le joueur doit finir sur dans la partie adversaire pour pouvoir récupérer des graines
-            boolean canCapture = true;
-
-            while (col >= 0 && col < NB_COL && canCapture) { // Tant qu'on peut capturer et qu'on est dans les colonnes adversaires
-                Cell currentCell = cells[line][col];
-                nbSeed = currentCell.getNbSeed();
-                if (nbSeed == 2 || nbSeed == 3) {
-                    currentPlayer.addScore(nbSeed);
-                    currentCell.clearSeed();
-
-                    // On ne peut pas changer de ligne sinon cela voudrait dire qu'on va de notre propre côté
-                    if (line == 0) {
-                        ++col;
-                    } else {
-                        --col;
-                    }
-                } else {
-                    canCapture = false; // On arrête la vérification de capture
-                }
-            }
+    public void undo() {
+        lastMove.undoMove();
+        this.currentPlayer = game.getOppositePlayer(currentPlayer);
+        for (Player pLoop : Arrays.asList(currentPlayer, game.getOppositePlayer(currentPlayer))) {
+            pLoop.sendGameUpdate(cells, game.getPOne().getCurrentScore(), game.getPTwo().getCurrentScore());
+            pLoop.sendData("MESSAGE SWITCH_TURN");
         }
     }
 
@@ -124,5 +102,9 @@ public class Round {
 
     public Cell[][] getCells() {
         return cells;
+    }
+
+    public Game getGame() {
+        return game;
     }
 }

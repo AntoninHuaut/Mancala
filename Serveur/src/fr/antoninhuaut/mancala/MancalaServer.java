@@ -1,7 +1,6 @@
 package fr.antoninhuaut.mancala;
 
-import fr.antoninhuaut.mancala.model.Game;
-import fr.antoninhuaut.mancala.model.Round;
+import fr.antoninhuaut.mancala.match.Game;
 import fr.antoninhuaut.mancala.model.Player;
 
 import java.net.ServerSocket;
