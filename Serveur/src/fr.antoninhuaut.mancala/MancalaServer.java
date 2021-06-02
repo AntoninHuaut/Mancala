@@ -6,32 +6,37 @@ import fr.antoninhuaut.mancala.model.Player;
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class MancalaServer {
 
+    private static final Logger LOGGER = LogManager.getLogger(MancalaServer.class);
+
     public static void main(String[] args) throws Exception {
-        int port = 3010;
+        var port = 3010;
 
         if (args.length > 1) {
             try {
                 port = Integer.parseInt(args[0]);
             } catch(NumberFormatException ex) {
-                System.err.println("Invalid number");
+                LOGGER.error("Invalid number");
+
             }
         }
 
-        System.out.printf("MancalaServer starting on port %d\n", port);
+        LOGGER.info("MancalaServer starting on port {} %n", port);
 
-        try (ServerSocket listener = new ServerSocket(port)) {
-            System.out.println("MancalaServer is running...");
+        try (var listener = new ServerSocket(port)) {
+            LOGGER.info("MancalaServer is running...");
             ExecutorService pool = Executors.newFixedThreadPool(200);
 
             while (true) {
-                Game game = new Game();
+                var game = new Game();
                 pool.execute(new Player(listener.accept(), game, true));
-                System.out.println("Player one joined");
+                LOGGER.debug("Player one joined");
                 pool.execute(new Player(listener.accept(), game, false));
-                System.out.println("Player two joined");
+                LOGGER.debug("Player two joined");
             }
         }
     }
