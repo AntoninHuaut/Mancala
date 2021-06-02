@@ -8,13 +8,14 @@ import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
 import javafx.beans.binding.StringBinding;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Ellipse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class GameController extends FXController {
 
@@ -24,10 +25,21 @@ public class GameController extends FXController {
     private final MancalaSocket mancalaSocket;
 
     @FXML
-    public Label infosLabel, pPosLabel;
+    public Label infosLabel;
 
     @FXML
-    public Label pOneScoreLabel, pTwoScoreLabel, playersNameLabel, redMatchLabel, blueMatchLabel;
+    public GridPane gameGrid;
+
+    @FXML
+    public Label pOneScoreLabel, pTwoScoreLabel, playersNameLabel, pOneMatchLabel, pTwoMatchLabel;
+
+    @FXML
+    public StackPane stackPlayerOne, stackPlayerTwo;
+    @FXML
+    public ImageView arrowPlayerOne, arrowPlayerTwo;
+
+    @FXML
+    public ImageView bol00, bol01, bol02, bol03, bol04, bol05, bol10, bol11, bol12, bol13, bol14, bol15;
 
     private int myPlayerId;
     private boolean isYourTurn = false;
@@ -39,9 +51,13 @@ public class GameController extends FXController {
 
     @Override
     public void postLoad() {
+        var random = new Random();
+        for (ImageView bol : Arrays.asList(bol00, bol01, bol02, bol03, bol04, bol05, bol10, bol11, bol12, bol13, bol14, bol15)) {
+            bol.setRotate(random.nextDouble() * 180);
+        }
+
         playersNameLabel.setVisible(false);
-        redMatchLabel.setVisible(false);
-        blueMatchLabel.setVisible(false);
+        gameGrid.setVisible(false);
 
         new Thread(() -> {
             try {
@@ -55,17 +71,17 @@ public class GameController extends FXController {
     }
 
     @FXML
-    public void ellipseClick(MouseEvent event) {
+    public void onCellClick(MouseEvent event) {
         if (!(event.getSource() instanceof StackPane)) return;
 
         var stackPane = (StackPane) event.getSource();
-        var ellipse = (Ellipse) stackPane.getChildren().get(0);
+        var imageView = (ImageView) stackPane.getChildren().get(0);
 
-        String[] idParts = ellipse.getId().split("-");
+        String[] idParts = imageView.getId().split("-");
         int line, col;
         try {
-            line = Integer.parseInt(idParts[1]);
-            col = Integer.parseInt(idParts[2]);
+            line = Integer.parseInt(idParts[0]);
+            col = Integer.parseInt(idParts[1]);
         } catch (NumberFormatException ignored) {
             return;
         }
@@ -94,36 +110,29 @@ public class GameController extends FXController {
     }
 
     public void initWelcome(String playerNumberResponse) {
-        boolean isRedPlayer = playerNumberResponse.equalsIgnoreCase("player_one");
-        StringBinding i18n;
-        if (isRedPlayer) {
-            i18n = I18NUtils.getInstance().bindStr("game.info.player_one");
-            pPosLabel.setTextFill(Color.web("#FF4D1F"));
+        boolean isPlayerOne = playerNumberResponse.equalsIgnoreCase("player_one");
+        if (isPlayerOne) {
             this.myPlayerId = 0;
+            this.arrowPlayerOne.setRotate(arrowPlayerOne.getRotate() + 3);
+            this.stackPlayerTwo.setVisible(false);
         } else {
-            i18n = I18NUtils.getInstance().bindStr("game.info.player_two");
-            pPosLabel.setTextFill(Color.web("#1E90FF"));
             this.myPlayerId = 1;
+            this.arrowPlayerTwo.setRotate(arrowPlayerTwo.getRotate() + 3);
+            this.stackPlayerOne.setVisible(false);
         }
-
-        pPosLabel.textProperty().bind(i18n);
     }
 
     public void initPostPlayerJoin(boolean isYourTurn) {
         this.isYourTurn = isYourTurn;
         setTurnLabel();
-
-        redMatchLabel.setVisible(true);
-        blueMatchLabel.setVisible(true);
+        gameGrid.setVisible(true);
     }
 
     public void setTurnLabel() {
         if (isYourTurn) {
-            setInfosLabelI18N("game.info.turn_you");
-            infosLabel.setTextFill(Color.web("#0dee36"));
+            setInfosLabelI18N("game.info.turn_you", "#4caf50");
         } else {
-            setInfosLabelI18N("game.info.turn_opponent");
-            infosLabel.setTextFill(Color.web("#ee4e0d"));
+            setInfosLabelI18N("game.info.turn_opponent", "#ee4e0d");
         }
     }
 
@@ -132,8 +141,12 @@ public class GameController extends FXController {
         playersNameLabel.setText(mancalaSocket.getUsername() + " VS " + opponentName);
     }
 
-    public void setInfosLabelI18N(String i18nKey) {
+    public void setInfosLabelI18N(String i18nKey, String hexColor) {
         if (infosLabel.textProperty().isBound()) infosLabel.textProperty().unbind();
         infosLabel.textProperty().bind(I18NUtils.getInstance().bindStr(i18nKey));
+
+        if (hexColor != null) {
+            infosLabel.setTextFill(Color.web(hexColor));
+        }
     }
 }

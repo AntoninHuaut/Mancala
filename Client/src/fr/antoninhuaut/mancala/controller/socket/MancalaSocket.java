@@ -8,8 +8,6 @@ import fr.antoninhuaut.mancala.model.views.socket.SocketConnectionData;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
 import javafx.application.Platform;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -103,7 +101,7 @@ public class MancalaSocket {
 
     private void analyseMessage(SocketMessageEnum msgEnum, String[] arguments) {
         if (msgEnum == SocketMessageEnum.WAIT_OPPONENT) {
-            fx(() -> gameController.setInfosLabelI18N("game.info.wait_opponent"));
+            fx(() -> gameController.setInfosLabelI18N("game.info.wait_opponent", "#000000"));
         } //
     }
 
