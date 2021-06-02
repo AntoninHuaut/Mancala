@@ -4,6 +4,7 @@ module fr.antoninhuaut.projet {
     requires javafx.controls;
     requires javafx.fxml;
     requires MaterialFX.materialfx.main;
+    requires org.slf4j;
 
     opens fr.antoninhuaut.mancala.controller.socket;
 

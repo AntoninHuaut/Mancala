@@ -8,14 +8,17 @@ import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
 import javafx.beans.binding.StringBinding;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GameController extends FXController {
+
+//    private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
 
     private final HomeView homeView;
     private final MancalaSocket mancalaSocket;
@@ -72,7 +75,8 @@ public class GameController extends FXController {
 
     public void updateGameState(Cell[][] cells, int playerTurnId, int pOneScore, int pTwoScore) {
         var scene = infosLabel.getScene();
-        System.out.println("Updating cells & score");
+//        LOGGER.debug("Updating game state [playerTurnId: {}, pOneScore: {}, pTwoScore: {}]",
+//                playerTurnId, pOneScore, pTwoScore);
 
         for (var line = 0; line < cells.length; ++line) {
             for (var col = 0; col < cells[line].length; ++col) {

@@ -86,7 +86,6 @@ public class Player implements Runnable {
     private void processMoveCommand(int line, int col) {
         try {
             game.getCurrentRound().play(this, line, col);
-            sendData("VALID_MOVE"); // TODO utilité?
         } catch (IllegalStateException ex) {
             sendData("MESSAGE " + ex.getMessage());
         }

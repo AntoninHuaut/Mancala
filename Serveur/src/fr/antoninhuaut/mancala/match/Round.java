@@ -26,19 +26,20 @@ public class Round {
     public Round(Game game) {
         this.game = game;
         this.cells = new Cell[NB_LINE][NB_COL];
-//        for (var line = 0; line < NB_LINE; ++line) {
-//            for (var col = 0; col < NB_COL; ++col) {
-//                cells[line][col] = new Cell(null, 4);
-//            }
-//        }
-
-        // TODO DEBUG
         for (var line = 0; line < NB_LINE; ++line) {
             for (var col = 0; col < NB_COL; ++col) {
-                int value = line == 0 ? 0 : 4;
-                cells[line][col] = new Cell(value);
+                cells[line][col] = new Cell(4);
             }
         }
+
+//        TESTING
+//        for (var line = 0; line < NB_LINE; ++line) {
+//            for (var col = 0; col < NB_COL; ++col) {
+//                int value = line == 0 ? 0 : 4;
+//                cells[line][col] = new Cell(value);
+//            }
+//        }
+//        cells[0][5].addSeed();
     }
 
     public void initPostPlayersJoined() {
