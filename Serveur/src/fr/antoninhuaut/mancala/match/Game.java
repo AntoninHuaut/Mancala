@@ -4,7 +4,8 @@ import fr.antoninhuaut.mancala.model.Player;
 
 public class Game {
 
-    private Player pOne, pTwo;
+    private Player pOne;
+    private Player pTwo;
 
     private Round currentRound;
     private int nbRound;
@@ -15,7 +16,7 @@ public class Game {
     }
 
     public void startGame() {
-        for (int i = 0; i < 6; i++) {
+        for (var i = 0; i < 6; i++) {
             this.currentRound = new Round(this);
         }
     }

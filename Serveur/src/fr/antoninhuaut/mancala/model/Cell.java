@@ -2,7 +2,7 @@ package fr.antoninhuaut.mancala.model;
 
 import fr.antoninhuaut.mancala.match.Round;
 
-public class Cell implements Cloneable {
+public class Cell {
 
     private Integer ownPlayerId;
     private int nbSeed;
@@ -10,6 +10,11 @@ public class Cell implements Cloneable {
     public Cell(Integer ownPlayerId, int nbSeed) {
         this.ownPlayerId = ownPlayerId;
         this.nbSeed = nbSeed;
+    }
+
+    public Cell(Cell cell) {
+       this.ownPlayerId = cell.getOwnPlayerId();
+       this.nbSeed = cell.getNbSeed();
     }
 
     public Integer getOwnPlayerId() {
@@ -32,16 +37,10 @@ public class Cell implements Cloneable {
         this.nbSeed++;
     }
 
-    @Override
-    protected Cell clone() throws CloneNotSupportedException {
-        super.clone();
-        return new Cell(ownPlayerId, nbSeed);
-    }
-
     public static int getSeedInCellForPlayer(Cell[][] cells, Player player) {
-        int nbSeedCells = 0;
+        var nbSeedCells = 0;
 
-        for (int col = 0; col < Round.NB_COL; col++) {
+        for (var col = 0; col < Round.NB_COL; col++) {
             nbSeedCells += cells[player.getPlayerId()][col].getNbSeed();
         }
 

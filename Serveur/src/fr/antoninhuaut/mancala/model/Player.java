@@ -40,7 +40,9 @@ public class Player implements Runnable {
         } finally {
             try {
                 socket.close();
-            } catch (IOException ignored) {
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                // TODO
             }
         }
     }
@@ -106,8 +108,8 @@ public class Player implements Runnable {
             output.writeInt(pOneScore);
             output.writeInt(pTwoScore);
 
-            for (int line = 0; line < Round.NB_LINE; ++line) {
-                for (int col = 0; col < Round.NB_COL; ++col) {
+            for (var line = 0; line < Round.NB_LINE; ++line) {
+                for (var col = 0; col < Round.NB_COL; ++col) {
                     output.writeInt(line);
                     output.writeInt(col);
                     output.writeInt(cells[line][col].getNbSeed());

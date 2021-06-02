@@ -23,14 +23,25 @@ public class Move {
     }
 
     private synchronized void playMove(int linePlayed, int colPlayed, boolean allowSeedCapture) {
-        Cell cellPlayed = finalCells[linePlayed][colPlayed];
+        var cellPlayed = finalCells[linePlayed][colPlayed];
         int nbSeed = cellPlayed.getNbSeed();
         if (nbSeed <= 0) return;
 
         cellPlayed.clearSeed();
 
+        int[] res = putSeedOnOtherCell(nbSeed, linePlayed, colPlayed);
+        var line = res[0];
+        var col = res[1];
+
+        if (allowSeedCapture && line != linePlayed) { // Le joueur doit finir sur dans la partie adversaire pour pouvoir récupérer des graines
+            captureSeed(line, col);
+        }
+    }
+
+    private synchronized int[] putSeedOnOtherCell(int nbSeed, int linePlayed, int colPlayed) {
         int line = linePlayed;
         int col = colPlayed;
+
         while (nbSeed > 0) {
             do {
                 if (line == 0) {
@@ -52,26 +63,28 @@ public class Move {
             --nbSeed;
         }
 
-        if (line != linePlayed) { // Le joueur doit finir sur dans la partie adversaire pour pouvoir récupérer des graines
-            boolean canCapture = true;
+        return new int[] { line, col };
+    }
 
-            while (col >= 0 && col < Round.NB_COL && canCapture) { // Tant qu'on peut capturer et qu'on est dans les colonnes adversaires
-                Cell currentCell = finalCells[line][col];
-                nbSeed = currentCell.getNbSeed();
+    private synchronized void captureSeed(Integer line, Integer col) {
+        var canCapture = true;
 
-                if (allowSeedCapture && (nbSeed == 2 || nbSeed == 3)) {
-                    playerAddScore += nbSeed;
-                    currentCell.clearSeed();
+        while (col >= 0 && col < Round.NB_COL && canCapture) { // Tant qu'on peut capturer et qu'on est dans les colonnes adversaires
+            var currentCell = finalCells[line][col];
+            int nbSeed = currentCell.getNbSeed();
 
-                    // On ne peut pas changer de ligne sinon cela voudrait dire qu'on va de notre propre côté
-                    if (line == 0) {
-                        ++col;
-                    } else {
-                        --col;
-                    }
+            if (nbSeed == 2 || nbSeed == 3) {
+                playerAddScore += nbSeed;
+                currentCell.clearSeed();
+
+                // On ne peut pas changer de ligne sinon cela voudrait dire qu'on va de notre propre côté
+                if (line == 0) {
+                    ++col;
                 } else {
-                    canCapture = false; // On arrête la vérification de capture
+                    --col;
                 }
+            } else {
+                canCapture = false; // On arrête la vérification de capture
             }
         }
     }
@@ -108,15 +121,15 @@ public class Move {
         /* REGLE 6 (Part 2) */
         if (opponentSeedsInCells == 0 && getMoveToFeedOpponent() == -1) {
             int currentPlayerSeedsInCells = Cell.getSeedInCellForPlayer(finalCells, currentPlayer);
-            for (int col = 0; col < Round.NB_COL; col++) {
+            for (var col = 0; col < Round.NB_COL; col++) {
                 finalCells[currentPlayer.getPlayerId()][col].clearSeed();
             }
             playerAddScore += currentPlayerSeedsInCells;
-            moveResult = MoveEnum.SUCCESS_AND_WIN__OPPONENT_CANT_PLAY;
+            moveResult = MoveEnum.SUCCESS_AND_WIN_OPPONENT_CANT_PLAY;
         }
         /* */
 
-        for (int line = 0; line < Round.NB_LINE; ++line) {
+        for (var line = 0; line < Round.NB_LINE; ++line) {
             System.arraycopy(finalCells[line], 0, roundCells[line], 0, Round.NB_COL);
         }
         currentPlayer.addScore(playerAddScore);
@@ -128,7 +141,7 @@ public class Move {
     public synchronized void undoMove() {
         if (!this.isDo) return;
 
-        for (int line = 0; line < Round.NB_LINE; ++line) {
+        for (var line = 0; line < Round.NB_LINE; ++line) {
             System.arraycopy(initialCells[line], 0, roundCells[line], 0, Round.NB_COL);
         }
 
@@ -144,7 +157,7 @@ public class Move {
     private int getMoveToFeedOpponent() {
         Cell[][] originalFinalCells = deepCopy(finalCells);
 
-        for (int col = 0; col < Round.NB_COL; col++) {
+        for (var col = 0; col < Round.NB_COL; col++) {
             playMove(currentPlayer.getPlayerId(), col, true);
             if (getOpponentSeedInCells() > 0) {
                 return col;
@@ -156,15 +169,12 @@ public class Move {
     }
 
     private Cell[][] deepCopy(Cell[][] cells) {
-        Cell[][] copyCells = new Cell[Round.NB_LINE][Round.NB_COL];
+        var copyCells = new Cell[Round.NB_LINE][Round.NB_COL];
 
-        try {
-            for (int line = 0; line < Round.NB_LINE; line++) {
-                for (int col = 0; col < Round.NB_COL; col++) {
-                    copyCells[line][col] = cells[line][col].clone();
-                }
+        for (var line = 0; line < Round.NB_LINE; line++) {
+            for (var col = 0; col < Round.NB_COL; col++) {
+                copyCells[line][col] = new Cell(cells[line][col]);
             }
-        } catch (CloneNotSupportedException ignored) {
         }
 
         return copyCells;

@@ -1,15 +1,18 @@
 package fr.antoninhuaut.mancala.match;
 
-import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.Move;
-import fr.antoninhuaut.mancala.model.MoveEnum;
 import fr.antoninhuaut.mancala.model.Player;
+import fr.antoninhuaut.mancala.model.Cell;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
 
 public class Round {
+
+    private static final Logger LOGGER = LogManager.getLogger(Round.class);
 
     public static final int NB_LINE = 2;
     public static final int NB_COL = 6;
@@ -23,15 +26,15 @@ public class Round {
     public Round(Game game) {
         this.game = game;
         this.cells = new Cell[NB_LINE][NB_COL];
-//        for (int line = 0; line < NB_LINE; ++line) {
-//            for (int col = 0; col < NB_COL; ++col) {
+//        for (var line = 0; line < NB_LINE; ++line) {
+//            for (var col = 0; col < NB_COL; ++col) {
 //                cells[line][col] = new Cell(null, 4);
 //            }
 //        }
 
         // TODO DEBUG
-        for (int line = 0; line < NB_LINE; ++line) {
-            for (int col = 0; col < NB_COL; ++col) {
+        for (var line = 0; line < NB_LINE; ++line) {
+            for (var col = 0; col < NB_COL; ++col) {
                 int value = line == 0 ? 0 : 4;
                 cells[line][col] = new Cell(null, value);
             }
@@ -45,15 +48,15 @@ public class Round {
         game.getOppositePlayer(currentPlayer).sendData("INIT_PLAYER OPPONENT");
 
         // SET CELLS OWNER
-        for (int line = 0; line < NB_LINE; ++line) {
-            for (int col = 0; col < NB_COL; ++col) {
+        for (var line = 0; line < NB_LINE; ++line) {
+            for (var col = 0; col < NB_COL; ++col) {
                 cells[line][col].setOwnPlayerId(line == 0 ? game.getPOne().getPlayerId() : game.getPTwo().getPlayerId());
             }
         }
     }
 
     public synchronized void play(Player player, int linePlayed, int colPlayed) {
-        Cell cellPlayed = cells[linePlayed][colPlayed];
+        var cellPlayed = cells[linePlayed][colPlayed];
 
         if (currentPlayer != player) {
             throw new IllegalStateException("NOT_YOUR_TURN");
@@ -62,8 +65,8 @@ public class Round {
         }
 
         lastMove = new Move(this, cells, currentPlayer);
-        MoveEnum moveEnum = lastMove.doMove(linePlayed, colPlayed);
-        System.out.println(moveEnum);
+        var moveEnum = lastMove.doMove(linePlayed, colPlayed);
+        LOGGER.debug(moveEnum);
         if (!moveEnum.isSuccess()) {
             // TODO message client
             return;
