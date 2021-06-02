@@ -4,25 +4,14 @@ import fr.antoninhuaut.mancala.match.Round;
 
 public class Cell {
 
-    private Integer ownPlayerId;
     private int nbSeed;
 
-    public Cell(Integer ownPlayerId, int nbSeed) {
-        this.ownPlayerId = ownPlayerId;
+    public Cell(int nbSeed) {
         this.nbSeed = nbSeed;
     }
 
     public Cell(Cell cell) {
-       this.ownPlayerId = cell.getOwnPlayerId();
        this.nbSeed = cell.getNbSeed();
-    }
-
-    public Integer getOwnPlayerId() {
-        return ownPlayerId;
-    }
-
-    public void setOwnPlayerId(Integer ownPlayerId) {
-        this.ownPlayerId = ownPlayerId;
     }
 
     public int getNbSeed() {

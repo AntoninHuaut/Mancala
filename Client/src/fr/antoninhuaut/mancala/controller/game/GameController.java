@@ -26,6 +26,7 @@ public class GameController extends FXController {
     @FXML
     public Label pOneScoreLabel, pTwoScoreLabel, playersNameLabel, redMatchLabel, blueMatchLabel;
 
+    private int myPlayerId;
     private boolean isYourTurn = false;
 
     public GameController(MancalaSocket mancalaSocket) {
@@ -53,10 +54,10 @@ public class GameController extends FXController {
     @FXML
     public void ellipseClick(MouseEvent event) {
         if (!(event.getSource() instanceof StackPane)) return;
-        // TODO game pas lancée (crée nouv msg) ou pas au tour du joueur
 
-        StackPane stackPane = (StackPane) event.getSource();
-        Ellipse ellipse = (Ellipse) stackPane.getChildren().get(0);
+        var stackPane = (StackPane) event.getSource();
+        var ellipse = (Ellipse) stackPane.getChildren().get(0);
+
         String[] idParts = ellipse.getId().split("-");
         int line, col;
         try {
@@ -69,20 +70,23 @@ public class GameController extends FXController {
         mancalaSocket.sendMove(line, col);
     }
 
-    public void updateCells_Score(Cell[][] cells, int pOneScore, int pTwoScore) {
-        Scene scene = infosLabel.getScene();
+    public void updateGameState(Cell[][] cells, int playerTurnId, int pOneScore, int pTwoScore) {
+        var scene = infosLabel.getScene();
         System.out.println("Updating cells & score");
 
-        for (int line = 0; line < cells.length; ++line) {
-            for (int col = 0; col < cells[line].length; ++col) {
-                Cell cell = cells[line][col];
-                Label cellLabel = (Label) scene.lookup(String.format("#cell-%d-%d", line, col));
+        for (var line = 0; line < cells.length; ++line) {
+            for (var col = 0; col < cells[line].length; ++col) {
+                var cell = cells[line][col];
+                var cellLabel = (Label) scene.lookup(String.format("#cell-%d-%d", line, col));
                 cellLabel.setText("" + cell.getNbSeed());
             }
         }
 
         pOneScoreLabel.setText("" + pOneScore);
         pTwoScoreLabel.setText("" + pTwoScore);
+
+        this.isYourTurn = playerTurnId == myPlayerId;
+        setTurnLabel();
     }
 
     public void initWelcome(String playerNumberResponse) {
@@ -91,9 +95,11 @@ public class GameController extends FXController {
         if (isRedPlayer) {
             i18n = I18NUtils.getInstance().bindStr("game.info.player_one");
             pPosLabel.setTextFill(Color.web("#FF4D1F"));
+            this.myPlayerId = 0;
         } else {
             i18n = I18NUtils.getInstance().bindStr("game.info.player_two");
             pPosLabel.setTextFill(Color.web("#1E90FF"));
+            this.myPlayerId = 1;
         }
 
         pPosLabel.textProperty().bind(i18n);
@@ -115,11 +121,6 @@ public class GameController extends FXController {
             setInfosLabelI18N("game.info.turn_opponent");
             infosLabel.setTextFill(Color.web("#ee4e0d"));
         }
-    }
-
-    public void switchTurn() {
-        this.isYourTurn = !isYourTurn;
-        setTurnLabel();
     }
 
     public void setPlayersName(String opponentName) {

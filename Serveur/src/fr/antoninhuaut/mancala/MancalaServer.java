@@ -6,12 +6,13 @@ import fr.antoninhuaut.mancala.model.Player;
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MancalaServer {
 
-    private static final Logger LOGGER = LogManager.getLogger(MancalaServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MancalaServer.class);
 
     public static void main(String[] args) throws Exception {
         var port = 3010;
@@ -25,7 +26,7 @@ public class MancalaServer {
             }
         }
 
-        LOGGER.info("MancalaServer starting on port {} %n", port);
+        LOGGER.info("MancalaServer starting on port {}", port);
 
         try (var listener = new ServerSocket(port)) {
             LOGGER.info("MancalaServer is running...");

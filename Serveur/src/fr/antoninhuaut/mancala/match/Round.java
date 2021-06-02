@@ -3,8 +3,8 @@ package fr.antoninhuaut.mancala.match;
 import fr.antoninhuaut.mancala.model.Move;
 import fr.antoninhuaut.mancala.model.Player;
 import fr.antoninhuaut.mancala.model.Cell;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class Round {
 
-    private static final Logger LOGGER = LogManager.getLogger(Round.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Round.class);
 
     public static final int NB_LINE = 2;
     public static final int NB_COL = 6;
@@ -36,7 +36,7 @@ public class Round {
         for (var line = 0; line < NB_LINE; ++line) {
             for (var col = 0; col < NB_COL; ++col) {
                 int value = line == 0 ? 0 : 4;
-                cells[line][col] = new Cell(null, value);
+                cells[line][col] = new Cell(value);
             }
         }
     }
@@ -46,35 +46,26 @@ public class Round {
         this.currentPlayer = new Random().nextBoolean() ? game.getPOne() : game.getPTwo();
         this.currentPlayer.sendData("INIT_PLAYER YOU");
         game.getOppositePlayer(currentPlayer).sendData("INIT_PLAYER OPPONENT");
-
-        // SET CELLS OWNER
-        for (var line = 0; line < NB_LINE; ++line) {
-            for (var col = 0; col < NB_COL; ++col) {
-                cells[line][col].setOwnPlayerId(line == 0 ? game.getPOne().getPlayerId() : game.getPTwo().getPlayerId());
-            }
-        }
     }
 
     public synchronized void play(Player player, int linePlayed, int colPlayed) {
-        var cellPlayed = cells[linePlayed][colPlayed];
-
         if (currentPlayer != player) {
             throw new IllegalStateException("NOT_YOUR_TURN");
-        } else if (cellPlayed.getOwnPlayerId() != player.getPlayerId()) {
+        } else if (linePlayed != player.getPlayerId()) {
             throw new IllegalStateException("NOT_YOUR_CELL");
         }
 
         lastMove = new Move(this, cells, currentPlayer);
         var moveEnum = lastMove.doMove(linePlayed, colPlayed);
-        LOGGER.debug(moveEnum);
+        LOGGER.debug("Move: {}", moveEnum);
         if (!moveEnum.isSuccess()) {
             // TODO message client
             return;
         }
 
-        for (Player pLoop : Arrays.asList(currentPlayer, game.getOppositePlayer(currentPlayer))) {
-            pLoop.sendGameUpdate(cells, game.getPOne().getCurrentScore(), game.getPTwo().getCurrentScore());
-            pLoop.sendData("MESSAGE SWITCH_TURN"); // TODO précisez quel joueur au cas où
+        var nextPlayerTurn = game.getOppositePlayer(currentPlayer);
+        for (Player pLoop : Arrays.asList(currentPlayer, nextPlayerTurn)) {
+            pLoop.sendGameUpdate(cells, nextPlayerTurn.getPlayerId(), game.getPOne().getCurrentScore(), game.getPTwo().getCurrentScore());
         }
 
         Optional<Player> optWinner = getWinner();
@@ -85,16 +76,18 @@ public class Round {
             // TODO gestion 6 rounds/fin du jeu
         }
 
-        this.currentPlayer = game.getOppositePlayer(currentPlayer);
+        this.currentPlayer = nextPlayerTurn;
     }
 
     public void undo() {
         lastMove.undoMove();
-        this.currentPlayer = game.getOppositePlayer(currentPlayer);
-        for (Player pLoop : Arrays.asList(currentPlayer, game.getOppositePlayer(currentPlayer))) {
-            pLoop.sendGameUpdate(cells, game.getPOne().getCurrentScore(), game.getPTwo().getCurrentScore());
-            pLoop.sendData("MESSAGE SWITCH_TURN");
+
+        var nextPlayerTurn = game.getOppositePlayer(currentPlayer);
+        for (Player pLoop : Arrays.asList(currentPlayer, nextPlayerTurn)) {
+            pLoop.sendGameUpdate(cells, nextPlayerTurn.getPlayerId(), game.getPOne().getCurrentScore(), game.getPTwo().getCurrentScore());
         }
+
+        this.currentPlayer = nextPlayerTurn;
     }
 
     private Optional<Player> getWinner() {

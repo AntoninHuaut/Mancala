@@ -50,8 +50,15 @@ public class Player implements Runnable {
     private void setup() throws IOException {
         this.input = new Scanner(socket.getInputStream());
         this.output = new ObjectOutputStream(socket.getOutputStream());
+
+        String inputData = input.nextLine();
+        String[] data = inputData.split(" ");
+        if (data[0].equals("CLIENT_INIT")) {
+            this.username = data[1];
+        }
+
         sendData("WELCOME PLAYER_" + (isPlayerOne ? "ONE" : "TWO"));
-        sendGameUpdate(game.getCurrentRound().getCells(), 0, 0);
+        sendGameUpdate(game.getCurrentRound().getCells(), 0, 0, 0);
 
         if (isPlayerOne) {
             game.setPlayerOne(this);
@@ -73,14 +80,6 @@ public class Player implements Runnable {
                 String[] data = command.split(" ");
                 processMoveCommand(Integer.parseInt(data[1]), Integer.parseInt(data[2]));
             } //
-            else if (command.startsWith("CLIENT_INIT")) { // CLIENT_INIT <username>
-                String[] data = command.split(" ");
-                this.username = data[1];
-
-                if (game.getOppositePlayer(this) != null) {
-                    game.sendPlayersName();
-                }
-            }
         }
     }
 
@@ -102,9 +101,10 @@ public class Player implements Runnable {
         }
     }
 
-    public void sendGameUpdate(Cell[][] cells, int pOneScore, int pTwoScore) {
+    public void sendGameUpdate(Cell[][] cells, int turnPlayerId, int pOneScore, int pTwoScore) {
         try {
             output.writeObject("GAME_UPDATE");
+            output.writeInt(turnPlayerId);
             output.writeInt(pOneScore);
             output.writeInt(pTwoScore);
 

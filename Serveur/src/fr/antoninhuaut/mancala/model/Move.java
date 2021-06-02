@@ -2,6 +2,9 @@ package fr.antoninhuaut.mancala.model;
 
 import fr.antoninhuaut.mancala.match.Round;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Move {
 
     private final Round round;
@@ -97,10 +100,10 @@ public class Move {
         int opponentSeedsInCells = getOpponentSeedInCells();
         /* REGLE 6 (Part 1) */
         if (opponentSeedsInCells == 0) {
-            int colPossible = getMoveToFeedOpponent();
-            if (colPossible == -1) { // TODO A faire après un move
+            List<Integer> colPossible = getMoveToFeedOpponent();
+            if (colPossible.isEmpty()) { // TODO A faire après un move
                 // Fin du jeu
-            } else if (colPossible != colPlayed) {
+            } else if (!colPossible.contains(colPlayed)) {
                 return MoveEnum.FAILED_FEED_OPPONENT_POSSIBLE;
             }
         }
@@ -119,7 +122,7 @@ public class Move {
 
         opponentSeedsInCells = getOpponentSeedInCells();
         /* REGLE 6 (Part 2) */
-        if (opponentSeedsInCells == 0 && getMoveToFeedOpponent() == -1) {
+        if (opponentSeedsInCells == 0 && getMoveToFeedOpponent().isEmpty()) {
             int currentPlayerSeedsInCells = Cell.getSeedInCellForPlayer(finalCells, currentPlayer);
             for (var col = 0; col < Round.NB_COL; col++) {
                 finalCells[currentPlayer.getPlayerId()][col].clearSeed();
@@ -154,18 +157,19 @@ public class Move {
         return Cell.getSeedInCellForPlayer(finalCells, round.getGame().getOppositePlayer(currentPlayer));
     }
 
-    private int getMoveToFeedOpponent() {
+    private List<Integer> getMoveToFeedOpponent() {
         Cell[][] originalFinalCells = deepCopy(finalCells);
+        List<Integer> possibleMove = new ArrayList<>();
 
         for (var col = 0; col < Round.NB_COL; col++) {
             playMove(currentPlayer.getPlayerId(), col, true);
             if (getOpponentSeedInCells() > 0) {
-                return col;
+                possibleMove.add(col);
             }
             finalCells = deepCopy(originalFinalCells);
         }
 
-        return -1;
+        return possibleMove;
     }
 
     private Cell[][] deepCopy(Cell[][] cells) {

@@ -23,9 +23,6 @@ public class Game {
 
     public void initPostPlayersJoined() {
         currentRound.initPostPlayersJoined();
-    }
-
-    public void sendPlayersName() {
         pOne.sendData("OPPONENT_NAME " + pTwo.getUsername());
         pTwo.sendData("OPPONENT_NAME " + pOne.getUsername());
     }

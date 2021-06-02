@@ -59,7 +59,7 @@ public class MancalaSocket {
         }
     }
 
-    private void analyseRequest(SocketExchangeEnum sEnum, String[] args) throws IOException, ClassNotFoundException {
+    private void analyseRequest(SocketExchangeEnum sEnum, String[] args) throws IOException {
         if (sEnum == SocketExchangeEnum.WELCOME) {
             final String playerNumber = args[1];
             fx(() -> gameController.initWelcome(playerNumber));
@@ -79,20 +79,21 @@ public class MancalaSocket {
             fx(() -> gameController.setPlayersName(opponentName));
         } //
         else if (sEnum == SocketExchangeEnum.GAME_UPDATE) {
-            int pOneScore = in.readInt();
-            int pTwoScore = in.readInt();
+            var playerTurnId = in.readInt();
+            var pOneScore = in.readInt();
+            var pTwoScore = in.readInt();
 
-            Cell[][] cells = new Cell[NB_LINE][NB_COL];
-            for (int line = 0; line < NB_LINE; ++line) {
-                for (int col = 0; col < NB_COL; ++col) {
-                    int cellLine = in.readInt();
-                    int cellCol = in.readInt();
-                    int cellNbSeed = in.readInt();
+            var cells = new Cell[NB_LINE][NB_COL];
+            for (var line = 0; line < NB_LINE; ++line) {
+                for (var col = 0; col < NB_COL; ++col) {
+                    var cellLine = in.readInt();
+                    var cellCol = in.readInt();
+                    var cellNbSeed = in.readInt();
                     cells[cellLine][cellCol] = new Cell(cellNbSeed);
                 }
             }
 
-            fx(() -> gameController.updateCells_Score(cells, pOneScore, pTwoScore));
+            fx(() -> gameController.updateGameState(cells, playerTurnId, pOneScore, pTwoScore));
         } //
     }
 
@@ -100,9 +101,6 @@ public class MancalaSocket {
         if (msgEnum == SocketMessageEnum.WAIT_OPPONENT) {
             fx(() -> gameController.setInfosLabelI18N("game.info.wait_opponent"));
         } //
-        else if (msgEnum == SocketMessageEnum.SWITCH_TURN) {
-            fx(() -> gameController.switchTurn());
-        }
     }
 
     public void sendMove(int line, int col) {
