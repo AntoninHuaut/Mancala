@@ -6,10 +6,10 @@ import javafx.scene.paint.Color;
 
 public class GameData {
 
-    private final BooleanProperty stackPlayerOneVisibility = new SimpleBooleanProperty();
-    private final BooleanProperty stackPlayerTwoVisibility = new SimpleBooleanProperty();
-    private final BooleanProperty gameGridVisibility = new SimpleBooleanProperty();
-    private final BooleanProperty playersNameLabelVisiblity = new SimpleBooleanProperty();
+    private final BooleanProperty stackPlayerOneVisibility = new SimpleBooleanProperty(false);
+    private final BooleanProperty stackPlayerTwoVisibility = new SimpleBooleanProperty(false);
+    private final BooleanProperty gameGridVisibility = new SimpleBooleanProperty(false);
+    private final BooleanProperty playersNameLabelVisiblity = new SimpleBooleanProperty(false);
 
     private final StringProperty playersNameLabelText = new SimpleStringProperty();
     private final StringProperty pOneScoreLabelText = new SimpleStringProperty();

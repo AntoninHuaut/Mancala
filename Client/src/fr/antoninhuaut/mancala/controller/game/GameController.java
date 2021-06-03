@@ -164,10 +164,10 @@ public class GameController extends FXController {
         boolean isPlayerOne = playerNumberResponse.equalsIgnoreCase("player_one");
         if (isPlayerOne) {
             this.myPlayerId = 0;
-            gameData.stackPlayerTwoVisibilityProperty().set(false);
+            gameData.stackPlayerOneVisibilityProperty().set(true);
         } else {
             this.myPlayerId = 1;
-            gameData.stackPlayerOneVisibilityProperty().set(false);
+            gameData.stackPlayerTwoVisibilityProperty().set(true);
         }
     }
 
