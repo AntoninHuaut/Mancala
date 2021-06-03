@@ -2,6 +2,8 @@ package fr.antoninhuaut.mancala.model;
 
 import fr.antoninhuaut.mancala.match.Game;
 import fr.antoninhuaut.mancala.match.Round;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -9,11 +11,12 @@ import java.net.Socket;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Player implements Runnable {
+public class Player {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String username = "Player" + (new Random().nextInt(899) + 100);
 
-    private final Game game;
     private int nbRoundWin;
     private int currentScore;
 
@@ -21,19 +24,17 @@ public class Player implements Runnable {
     private Scanner input;
     private ObjectOutputStream output;
 
-    private final boolean isPlayerOne;
+    /* Init by Game */
+    private boolean isPlayerOne;
+    private Game game;
 
-    public Player(Socket socket, Game game, boolean isPlayerOne) {
+    public Player(Socket socket) {
         this.socket = socket;
-        this.game = game;
-        this.isPlayerOne = isPlayerOne;
         this.nbRoundWin = 0;
     }
 
-    @Override
-    public void run() {
+    public void runStart() {
         try {
-            setup();
             processCommands();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -47,7 +48,10 @@ public class Player implements Runnable {
         }
     }
 
-    private void setup() throws IOException {
+    public void setup(Game game, boolean isPlayerOne) throws IOException {
+        this.game = game;
+        this.isPlayerOne = isPlayerOne;
+
         this.input = new Scanner(socket.getInputStream());
         this.output = new ObjectOutputStream(socket.getOutputStream());
 
@@ -55,24 +59,19 @@ public class Player implements Runnable {
         String[] data = inputData.split(" ");
         if (data[0].equals("CLIENT_INIT")) {
             this.username = data[1];
+            LOGGER.debug("Receive CLIENT_INIT: {}", username);
         }
 
         sendData("WELCOME PLAYER_" + (isPlayerOne ? "ONE" : "TWO"));
-
-        if (isPlayerOne) {
-            game.setPlayerOne(this);
-            sendData("MESSAGE WAIT_OPPONENT");
-        } else {
-            game.setPlayerTwo(this);
-            game.initPostPlayersJoined();
-        }
     }
 
     private void processCommands() {
         while (input.hasNextLine()) {
             String command = input.nextLine();
+            LOGGER.debug("Receive from {}: {}", username, command);
+
             if (command.startsWith("QUIT")) {
-                // TODO, exit game?
+                game.getSession().removePlayer(this);
                 return;
             } //
             else if (command.startsWith("MOVE")) { // MOVE <line> <col>

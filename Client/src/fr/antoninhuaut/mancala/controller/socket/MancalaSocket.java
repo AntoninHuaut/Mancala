@@ -39,32 +39,32 @@ public class MancalaSocket {
         this.homeView = homeView;
 
         this.out.println("CLIENT_INIT " + socketConnectionData.getUsername());
+        this.homeView.getController().setMancalaSocket(this);
     }
 
-    public void start(GameController gameController) throws Exception {
+    public void start(GameController gameController) throws IOException {
         this.gameController = gameController;
         try {
+            var loop = true;
             do {
                 String res = (String) in.readObject();
                 String[] arguments = res.split(" ");
                 LOGGER.debug("Receive: {}", res);
 
-                try {
-                    analyseRequest(SocketExchangeEnum.valueOf(arguments[0]), arguments);
-                } catch (IllegalArgumentException ignored) {
-                }
-            } while (true); // TODO SERVER MSG TO EXIT
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            // TODO alert?
+                loop = analyseRequest(SocketExchangeEnum.extractFromCommand(arguments[0]), arguments);
+            } while (loop);
+        } catch (Exception ignored) {
         } finally {
             socket.close();
             new SocketConnectionView(homeView).load();
         }
     }
 
-    private void analyseRequest(SocketExchangeEnum sEnum, String[] args) throws IOException {
-        if (sEnum == SocketExchangeEnum.WELCOME) {
+    private boolean analyseRequest(SocketExchangeEnum sEnum, String[] args) throws IOException {
+        if (sEnum == SocketExchangeEnum.QUIT) {
+            return false;
+        } //
+        else if (sEnum == SocketExchangeEnum.WELCOME) {
             final String playerNumber = args[1];
             fx(() -> gameController.initWelcome(playerNumber));
         } //
@@ -99,12 +99,22 @@ public class MancalaSocket {
 
             fx(() -> gameController.updateGameState(cells, playerTurnId, pOneScore, pTwoScore));
         } //
+
+        return true;
     }
 
     private void analyseMessage(SocketMessageEnum msgEnum, String[] arguments) {
         if (msgEnum == SocketMessageEnum.WAIT_OPPONENT) {
-            fx(() -> gameController.setInfosLabelI18N("game.info.wait_opponent", "#000000"));
+            fx(() -> gameController.waitOpponent());
         } //
+    }
+
+    public void disconnect() {
+        try {
+            out.println("QUIT");
+            socket.close();
+        } catch (IOException ignored) {
+        }
     }
 
     public void sendMove(int line, int col) {

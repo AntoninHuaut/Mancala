@@ -1,5 +1,7 @@
 package fr.antoninhuaut.mancala.controller.global;
 
+import fr.antoninhuaut.mancala.controller.socket.MancalaSocket;
+import fr.antoninhuaut.mancala.utils.components.alert.ConfirmAlert;
 import fr.antoninhuaut.mancala.view.global.FXView;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.global.ToolbarView;
@@ -30,7 +32,7 @@ public class WindowController extends FXController {
     public ImageView helpIcon;
 
     public WindowController() {
-        instance = this;
+        WindowController.instance = this;
     }
 
     public void setView(WindowView view) {
@@ -48,6 +50,27 @@ public class WindowController extends FXController {
 
         setImgHoverColor(this.homeIcon, YELLOW);
         setImgHoverColor(this.helpIcon, YELLOW);
+    }
+
+    @FXML
+    public void onHomeMenuClick() {
+        var mancalaSocket = homeView.getController().getMancalaSocket();
+        if (mancalaSocket == null) {
+            new SocketConnectionView(this.homeView).load();
+        } else {
+            new ConfirmAlert("window.home.ingame", () -> {
+                mancalaSocket.disconnect(); // Will load to SocketConnectionView
+                homeView.getController().setMancalaSocket(null);
+            }).showAndWait();
+        }
+    }
+
+    public void disconnectForClose() {
+        var mancalaSocket = homeView.getController().getMancalaSocket();
+        if (mancalaSocket != null) {
+            mancalaSocket.disconnect();
+            homeView.getController().setMancalaSocket(null);
+        }
     }
 
     public void setCurrentController(FXView<?> view) {

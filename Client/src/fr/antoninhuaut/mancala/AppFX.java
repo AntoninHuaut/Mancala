@@ -1,5 +1,6 @@
 package fr.antoninhuaut.mancala;
 
+import fr.antoninhuaut.mancala.controller.global.WindowController;
 import fr.antoninhuaut.mancala.utils.FadeUtils;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
 import fr.antoninhuaut.mancala.view.global.WindowView;
@@ -34,7 +35,7 @@ public class AppFX extends Application {
     public void start(Stage primaryStage) {
         setInstance(this);
 
-        BorderPane pane = new BorderPane();
+        var pane = new BorderPane();
 
         primaryStage.setScene(new Scene(pane));
         new WindowView(pane).load();
@@ -54,6 +55,11 @@ public class AppFX extends Application {
                 FadeUtils.fade(this.stage, true);
             }
         });
+    }
+
+    @Override
+    public void stop() {
+        WindowController.getInstance().disconnectForClose();
     }
 
     public Stage getStage() {

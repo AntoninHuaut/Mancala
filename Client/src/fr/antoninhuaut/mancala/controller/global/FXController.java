@@ -1,5 +1,6 @@
 package fr.antoninhuaut.mancala.controller.global;
 
+import fr.antoninhuaut.mancala.controller.socket.MancalaSocket;
 import javafx.beans.binding.Bindings;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.Light;

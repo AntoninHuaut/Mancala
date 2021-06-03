@@ -16,6 +16,7 @@ import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -60,15 +61,12 @@ public class GameController extends FXController {
             bol.setRotate(random.nextDouble() * 180);
         }
 
-        playersNameLabel.setVisible(false);
-        gameGrid.setVisible(false);
+        waitOpponent();
 
         new Thread(() -> {
             try {
                 mancalaSocket.start(this);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                // TODO alert?
+            } catch (IOException ignored) {
                 new SocketConnectionView(homeView).load();
             }
         }).start();
@@ -138,6 +136,12 @@ public class GameController extends FXController {
         } else {
             setInfosLabelI18N("game.info.turn_opponent", "#ee4e0d");
         }
+    }
+
+    public void waitOpponent() {
+        playersNameLabel.setVisible(false);
+        gameGrid.setVisible(false);
+        setInfosLabelI18N("game.info.wait_opponent", "#000000");
     }
 
     public void setPlayersName(String opponentName) {

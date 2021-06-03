@@ -1,10 +1,10 @@
 package fr.antoninhuaut.mancala.match;
 
+import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.Move;
 import fr.antoninhuaut.mancala.model.Player;
-import fr.antoninhuaut.mancala.model.Cell;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class Round {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Round.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final int NB_LINE = 2;
     public static final int NB_COL = 6;

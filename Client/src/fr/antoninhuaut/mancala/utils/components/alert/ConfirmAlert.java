@@ -12,8 +12,8 @@ public class ConfirmAlert extends GenericAlert {
     public ConfirmAlert(String key, Runnable okRun, Runnable noRun) {
         super(AlertType.CONFIRMATION, key);
 
-        ButtonType yesBtnType = new ButtonType(I18NUtils.getInstance().get("common.yes"), ButtonBar.ButtonData.YES);
-        ButtonType noBtnType = new ButtonType(I18NUtils.getInstance().get("common.no"), ButtonBar.ButtonData.NO);
+        var yesBtnType = new ButtonType(I18NUtils.getInstance().get("common.yes"), ButtonBar.ButtonData.YES);
+        var noBtnType = new ButtonType(I18NUtils.getInstance().get("common.no"), ButtonBar.ButtonData.NO);
 
         this.getButtonTypes().setAll(yesBtnType, noBtnType);
 
