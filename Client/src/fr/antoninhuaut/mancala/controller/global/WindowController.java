@@ -2,6 +2,7 @@ package fr.antoninhuaut.mancala.controller.global;
 
 import fr.antoninhuaut.mancala.controller.socket.MancalaSocket;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
+import fr.antoninhuaut.mancala.utils.components.alert.AboutAlert;
 import fr.antoninhuaut.mancala.utils.components.alert.ConfirmAlert;
 import fr.antoninhuaut.mancala.view.global.FXView;
 import fr.antoninhuaut.mancala.view.global.HomeView;
@@ -98,6 +99,11 @@ public class WindowController extends FXController {
                 homeView.getController().setMancalaSocket(null);
             }).showAndWait();
         }
+    }
+
+    @FXML
+    public void onAboutClick() {
+        new AboutAlert();
     }
 
     public void setCurrentController(FXView<?> view) {
