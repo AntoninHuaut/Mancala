@@ -7,9 +7,7 @@ import fr.antoninhuaut.mancala.model.views.game.GameData;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -22,9 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class GameController extends FXController {
 
@@ -34,7 +30,7 @@ public class GameController extends FXController {
     private final MancalaSocket mancalaSocket;
 
     @FXML
-    public Label infosLabel;
+    public Label infosLabel, errorLabel;
 
     @FXML
     public GridPane gameGrid;
@@ -54,6 +50,8 @@ public class GameController extends FXController {
     private boolean isYourTurn = false;
 
     private GameData gameData;
+    private final Timer errorTimer = new Timer();
+    private TimerTask errorTimerTask;
 
     public GameController(MancalaSocket mancalaSocket) {
         this.homeView = mancalaSocket.getHomeView();
@@ -78,6 +76,11 @@ public class GameController extends FXController {
         }
 
         bindGameProperties();
+    }
+
+    @Override
+    public void unload() {
+        cancelTimerTask();
     }
 
     private void bindGameProperties() {
@@ -108,18 +111,21 @@ public class GameController extends FXController {
         }
 
         gameGrid.visibleProperty().bind(gameData.gameGridVisibilityProperty());
+        errorLabel.visibleProperty().bind(gameData.errorLabelVisibilityProperty());
         infosLabel.textFillProperty().bind(gameData.infosLabelColorProperty());
 
         if (gameData.infosLabelTextProperty() != null) {
-            if (infosLabel.textProperty().isBound()) infosLabel.textProperty().unbind();
             infosLabel.textProperty().bind(gameData.infosLabelTextProperty());
+        }
+        if (gameData.errorLabelTextProperty() != null) {
+            errorLabel.textProperty().bind(gameData.errorLabelTextProperty());
         }
 
         playersNameLabel.visibleProperty().bind(gameData.playersNameLabelVisiblityProperty());
         playersNameLabel.textProperty().bind(gameData.playersNameLabelTextProperty());
         pOneScoreLabel.textProperty().bind(gameData.pOneScoreLabelTextProperty());
         pTwoScoreLabel.textProperty().bind(gameData.pTwoScoreLabelTextProperty());
-        
+
         stackPlayerOne.visibleProperty().bind(gameData.stackPlayerOneVisibilityProperty());
         stackPlayerTwo.visibleProperty().bind(gameData.stackPlayerTwoVisibilityProperty());
     }
@@ -158,6 +164,7 @@ public class GameController extends FXController {
 
         this.isYourTurn = playerTurnId == myPlayerId;
         setTurnLabel();
+        cancelTimerTask();
     }
 
     public void initWelcome(String playerNumberResponse) {
@@ -179,16 +186,16 @@ public class GameController extends FXController {
 
     public void setTurnLabel() {
         if (isYourTurn) {
-            setInfosLabelI18N("game.info.turn_you", "#4caf50");
+            setInfosLabel("game.info.turn_you", "#4caf50");
         } else {
-            setInfosLabelI18N("game.info.turn_opponent", "#ee4e0d");
+            setInfosLabel("game.info.turn_opponent", "#00B2EE");
         }
     }
 
     public void waitOpponent() {
         gameData.playersNameLabelVisiblityProperty().set(false);
         gameData.gameGridVisibilityProperty().set(false);
-        setInfosLabelI18N("game.info.wait_opponent", "#000000");
+        setInfosLabel("game.info.wait_opponent", "#000000");
     }
 
     public void setPlayersName(String opponentName) {
@@ -196,13 +203,36 @@ public class GameController extends FXController {
         gameData.playersNameLabelTextProperty().set(mancalaSocket.getUsername() + " VS " + opponentName);
     }
 
-    public void setInfosLabelI18N(String i18nKey, String hexColor) {
+    public void setInfosLabel(String i18nKey, String hexColor) {
         if (infosLabel.textProperty().isBound()) infosLabel.textProperty().unbind();
         gameData.setInfosLabelTextProperty(I18NUtils.getInstance().bindStr(i18nKey));
         infosLabel.textProperty().bind(gameData.infosLabelTextProperty());
 
         if (hexColor != null) {
             gameData.infosLabelColorProperty().set(Color.web(hexColor));
+        }
+    }
+
+    public void setErrorLabel(String i18nKey) {
+        if (errorLabel.textProperty().isBound()) errorLabel.textProperty().unbind();
+        gameData.setErrorLabelTextProperty(I18NUtils.getInstance().bindStr("game.error." + i18nKey));
+        errorLabel.textProperty().bind(gameData.errorLabelTextProperty());
+
+        cancelTimerTask();
+        gameData.errorLabelVisibilityProperty().set(true);
+        errorTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                gameData.errorLabelVisibilityProperty().set(false);
+            }
+        };
+        errorTimer.schedule(errorTimerTask, 2500);
+    }
+
+    private void cancelTimerTask() {
+        if (errorTimerTask != null) {
+            gameData.errorLabelVisibilityProperty().set(false);
+            errorTimerTask.cancel();
         }
     }
 }

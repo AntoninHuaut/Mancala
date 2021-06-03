@@ -23,6 +23,7 @@ public abstract class FXMainView<T extends FXController> extends FXView<T> {
         WindowController.getInstance().setCurrentController(this);
 
         new Thread(() -> {
+            this.controller.unload();
             FXMLLoader loader = loadFXML(this.path);
             loader.setController(this.controller);
             try {

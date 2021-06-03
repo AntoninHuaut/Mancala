@@ -1,6 +1,5 @@
 package fr.antoninhuaut.mancala.controller.global;
 
-import fr.antoninhuaut.mancala.controller.socket.MancalaSocket;
 import javafx.beans.binding.Bindings;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.Light;
@@ -15,7 +14,7 @@ public abstract class FXController {
     public abstract void postLoad();
 
     public void setImgHoverColor(ImageView imgView, Color color) {
-        Lighting lighting = new Lighting();
+        var lighting = new Lighting();
         lighting.setDiffuseConstant(1.0);
         lighting.setSpecularConstant(0.0);
         lighting.setSpecularExponent(0.0);
@@ -27,4 +26,6 @@ public abstract class FXController {
                 .otherwise((Effect) null)
         );
     }
+
+    public void unload() {}
 }

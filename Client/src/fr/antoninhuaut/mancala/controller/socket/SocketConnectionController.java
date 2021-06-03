@@ -85,15 +85,10 @@ public class SocketConnectionController extends FXController {
                 var mancalaSocket = new MancalaSocket(socketConnectionData, homeView);
                 new GameView(mancalaSocket).load();
             } catch (IOException ex) {
-                callback(true);
+                setErrorMsgVisibility(true);
+                setLoadingSpinnerVisibility(false);
             }
         }).start();
-    }
-    //
-
-    private void callback(boolean hasError) {
-        setErrorMsgVisibility(hasError);
-        setLoadingSpinnerVisibility(false);
     }
 
     private void setErrorMsgVisibility(boolean state) {

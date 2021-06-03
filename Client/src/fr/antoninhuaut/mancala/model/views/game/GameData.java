@@ -10,6 +10,7 @@ public class GameData {
     private final BooleanProperty stackPlayerTwoVisibility = new SimpleBooleanProperty(false);
     private final BooleanProperty gameGridVisibility = new SimpleBooleanProperty(false);
     private final BooleanProperty playersNameLabelVisiblity = new SimpleBooleanProperty(false);
+    private final BooleanProperty errorLabelVisibility = new SimpleBooleanProperty(false);
 
     private final StringProperty playersNameLabelText = new SimpleStringProperty();
     private final StringProperty pOneScoreLabelText = new SimpleStringProperty();
@@ -19,7 +20,11 @@ public class GameData {
     private final StringProperty[][] cells = new StringProperty[2][6];
 
     private final ObjectProperty<Color> infosLabelColor = new SimpleObjectProperty<>();
-    private StringBinding infosLabelText;
+    private StringBinding infosLabelText, errorLabelText;
+
+    public BooleanProperty errorLabelVisibilityProperty() {
+        return errorLabelVisibility;
+    }
 
     public BooleanProperty stackPlayerOneVisibilityProperty() {
         return stackPlayerOneVisibility;
@@ -69,8 +74,16 @@ public class GameData {
         return infosLabelText;
     }
 
+    public StringBinding errorLabelTextProperty() {
+        return errorLabelText;
+    }
+
     public void setInfosLabelTextProperty(StringBinding stringBind) {
         this.infosLabelText = stringBind;
+    }
+
+    public void setErrorLabelTextProperty(StringBinding stringBind) {
+        this.errorLabelText = stringBind;
     }
 
 }
