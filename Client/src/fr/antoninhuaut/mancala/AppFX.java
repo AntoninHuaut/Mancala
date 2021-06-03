@@ -57,11 +57,6 @@ public class AppFX extends Application {
         });
     }
 
-    @Override
-    public void stop() {
-        WindowController.getInstance().disconnectForClose();
-    }
-
     public Stage getStage() {
         return this.stage;
     }

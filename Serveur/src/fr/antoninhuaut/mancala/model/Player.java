@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Random;
@@ -21,7 +22,7 @@ public class Player {
     private int currentScore;
 
     private final Socket socket;
-    private Scanner input;
+    private ObjectInputStream input;
     private ObjectOutputStream output;
 
     /* Init by Game */
@@ -33,48 +34,45 @@ public class Player {
         this.nbRoundWin = 0;
     }
 
-    public void runStart() {
-        try {
-            processCommands();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                // TODO
-            }
-        }
-    }
-
-    public void setup(Game game, boolean isPlayerOne) throws IOException {
+    public void setup(Game game, boolean isPlayerOne) throws IOException, ClassNotFoundException {
         this.game = game;
         this.isPlayerOne = isPlayerOne;
 
-        this.input = new Scanner(socket.getInputStream());
+        this.input = new ObjectInputStream(socket.getInputStream());
         this.output = new ObjectOutputStream(socket.getOutputStream());
 
-        String inputData = input.nextLine();
+        String inputData = (String) input.readObject();
+        LOGGER.debug("SETUP: {}", inputData);
+
         String[] data = inputData.split(" ");
         if (data[0].equals("CLIENT_INIT")) {
             this.username = data[1];
-            LOGGER.debug("Receive CLIENT_INIT: {}", username);
         }
 
         sendData("WELCOME PLAYER_" + (isPlayerOne ? "ONE" : "TWO"));
     }
 
-    private void processCommands() {
-        while (input.hasNextLine()) {
-            String command = input.nextLine();
+    public void runStart() {
+        try {
+            processCommands();
+        } catch (IOException | ClassNotFoundException ignored) {
+        } finally {
+            LOGGER.debug("Player {} quit", username);
+            game.getSession().removePlayer(this);
+
+            try {
+                socket.close();
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    private void processCommands() throws IOException, ClassNotFoundException {
+        while (true) {
+            String command = (String) input.readObject();
             LOGGER.debug("Receive from {}: {}", username, command);
 
-            if (command.startsWith("QUIT")) {
-                game.getSession().removePlayer(this);
-                return;
-            } //
-            else if (command.startsWith("MOVE")) { // MOVE <line> <col>
+            if (command.startsWith("MOVE")) { // MOVE <line> <col>
                 String[] data = command.split(" ");
                 processMoveCommand(Integer.parseInt(data[1]), Integer.parseInt(data[2]));
             } //

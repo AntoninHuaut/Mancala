@@ -65,14 +65,6 @@ public class WindowController extends FXController {
         }
     }
 
-    public void disconnectForClose() {
-        var mancalaSocket = homeView.getController().getMancalaSocket();
-        if (mancalaSocket != null) {
-            mancalaSocket.disconnect();
-            homeView.getController().setMancalaSocket(null);
-        }
-    }
-
     public void setCurrentController(FXView<?> view) {
         this.currentShowView = view;
     }

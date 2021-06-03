@@ -20,7 +20,7 @@ public class Round {
     private final Game game;
     private final Cell[][] cells;
 
-    private Player currentPlayer;
+    private Integer playerTurnId = null;
     private Move lastMove;
 
     public Round(Game game) {
@@ -35,17 +35,21 @@ public class Round {
 
     public void initPostPlayersJoined() {
         // SET CURRENT PLAYER
-        this.currentPlayer = new Random().nextBoolean() ? game.getPOne() : game.getPTwo();
-        this.currentPlayer.sendData("INIT_PLAYER YOU");
+        if (playerTurnId == null) {
+            playerTurnId = new Random().nextInt(2); // Between 0 & 1
+        }
+        var currentPlayer = getCurrentPlayer();
+        currentPlayer.sendData("INIT_PLAYER YOU");
         game.getOppositePlayer(currentPlayer).sendData("INIT_PLAYER OPPONENT");
 
-        sendGameUpdate(this.currentPlayer);
+        sendGameUpdate(currentPlayer);
     }
 
     public synchronized void play(Player player, int linePlayed, int colPlayed) {
+        var currentPlayer = getCurrentPlayer();
         if (currentPlayer != player) {
             throw new IllegalStateException("NOT_YOUR_TURN");
-        } else if (linePlayed != player.getPlayerId()) {
+        } else if (playerTurnId == null || linePlayed != player.getPlayerId()) {
             throw new IllegalStateException("NOT_YOUR_CELL");
         }
 
@@ -68,15 +72,16 @@ public class Round {
             // TODO gestion 6 rounds/fin du jeu
         }
 
-        this.currentPlayer = nextPlayerTurn;
+        this.playerTurnId = nextPlayerTurn.getPlayerId();
     }
 
     public void undo() {
         lastMove.undoMove();
 
+        var currentPlayer = getCurrentPlayer();
         var nextPlayerTurn = game.getOppositePlayer(currentPlayer);
         sendGameUpdate(nextPlayerTurn);
-        this.currentPlayer = nextPlayerTurn;
+        this.playerTurnId = nextPlayerTurn.getPlayerId();
     }
 
     private void sendGameUpdate(Player nextPlayerTurn) {
@@ -89,6 +94,15 @@ public class Round {
         if (game.getPOne().hasWin()) return Optional.of(game.getPOne());
         else if (game.getPTwo().hasWin()) return Optional.of(game.getPTwo());
         return Optional.empty();
+    }
+
+    private Player getCurrentPlayer() {
+        return getPlayerById(playerTurnId);
+    }
+
+    private Player getPlayerById(int id) {
+        if (id == 0) return game.getPOne();
+        else return game.getPTwo();
     }
 
     public Game getGame() {

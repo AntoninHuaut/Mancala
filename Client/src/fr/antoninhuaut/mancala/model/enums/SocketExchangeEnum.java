@@ -7,7 +7,6 @@ public enum SocketExchangeEnum {
     MESSAGE,
     GAME_UPDATE,
     OPPONENT_NAME,
-    QUIT,
     UNKNOWN;
 
     public static SocketExchangeEnum extractFromCommand(String data) {

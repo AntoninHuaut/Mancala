@@ -27,7 +27,7 @@ public class Game {
         }
     }
 
-    public synchronized void addPlayer(Player p) throws IOException {
+    public synchronized void addPlayer(Player p) throws IOException, ClassNotFoundException {
         boolean isPlayerOne;
         if (pOne == null) {
             pOne = p;

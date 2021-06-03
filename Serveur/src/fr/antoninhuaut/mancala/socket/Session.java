@@ -23,7 +23,7 @@ public class Session {
         return nbPlayer;
     }
 
-    public void addPlayer(Player p) throws IOException {
+    public void addPlayer(Player p) throws IOException, ClassNotFoundException {
         this.nbPlayer++;
         game.addPlayer(p);
     }

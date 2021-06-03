@@ -45,6 +45,6 @@ public class ToolbarController extends FXController {
     }
 
     public void exitApp() {
-        Platform.exit();
+        System.exit(0);
     }
 }

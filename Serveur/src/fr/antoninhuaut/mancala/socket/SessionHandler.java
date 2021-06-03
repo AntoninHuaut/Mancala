@@ -27,7 +27,7 @@ public class SessionHandler implements Runnable {
             var p = new Player(socket);
             getSessionOrCreateOne().addPlayer(p);
             p.runStart();
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
         }
     }

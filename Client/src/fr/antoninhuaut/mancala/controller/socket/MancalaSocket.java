@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -25,34 +26,33 @@ public class MancalaSocket {
 
     private final Socket socket;
     private final ObjectInputStream in;
-    private final PrintWriter out;
+    private final ObjectOutputStream out;
 
     private final HomeView homeView;
     private GameController gameController;
     private final String username;
 
-    public MancalaSocket(SocketConnectionData socketConnectionData, HomeView homeView) throws Exception {
+    public MancalaSocket(SocketConnectionData socketConnectionData, HomeView homeView) throws IOException {
         this.socket = new Socket(socketConnectionData.getHost(), socketConnectionData.getPort());
+        this.out = new ObjectOutputStream(socket.getOutputStream());
         this.in = new ObjectInputStream(socket.getInputStream());
-        this.out = new PrintWriter(socket.getOutputStream(), true);
         this.username = socketConnectionData.getUsername();
         this.homeView = homeView;
 
-        this.out.println("CLIENT_INIT " + socketConnectionData.getUsername());
+        sendData("CLIENT_INIT " + socketConnectionData.getUsername());
         this.homeView.getController().setMancalaSocket(this);
     }
 
     public void start(GameController gameController) throws IOException {
         this.gameController = gameController;
         try {
-            var loop = true;
             do {
                 String res = (String) in.readObject();
                 String[] arguments = res.split(" ");
                 LOGGER.debug("Receive: {}", res);
 
-                loop = analyseRequest(SocketExchangeEnum.extractFromCommand(arguments[0]), arguments);
-            } while (loop);
+                analyseRequest(SocketExchangeEnum.extractFromCommand(arguments[0]), arguments);
+            } while (true);
         } catch (Exception ignored) {
         } finally {
             socket.close();
@@ -60,11 +60,8 @@ public class MancalaSocket {
         }
     }
 
-    private boolean analyseRequest(SocketExchangeEnum sEnum, String[] args) throws IOException {
-        if (sEnum == SocketExchangeEnum.QUIT) {
-            return false;
-        } //
-        else if (sEnum == SocketExchangeEnum.WELCOME) {
+    private void analyseRequest(SocketExchangeEnum sEnum, String[] args) throws IOException {
+        if (sEnum == SocketExchangeEnum.WELCOME) {
             final String playerNumber = args[1];
             fx(() -> gameController.initWelcome(playerNumber));
         } //
@@ -99,8 +96,6 @@ public class MancalaSocket {
 
             fx(() -> gameController.updateGameState(cells, playerTurnId, pOneScore, pTwoScore));
         } //
-
-        return true;
     }
 
     private void analyseMessage(SocketMessageEnum msgEnum, String[] arguments) {
@@ -111,14 +106,20 @@ public class MancalaSocket {
 
     public void disconnect() {
         try {
-            out.println("QUIT");
             socket.close();
         } catch (IOException ignored) {
         }
     }
 
     public void sendMove(int line, int col) {
-        out.println(String.format("MOVE %d %d", line, col));
+        sendData(String.format("MOVE %d %d", line, col));
+    }
+
+    public void sendData(String data) {
+        try {
+            out.writeObject(data);
+        } catch (IOException ignored) {
+        }
     }
 
     private void fx(Runnable run) {

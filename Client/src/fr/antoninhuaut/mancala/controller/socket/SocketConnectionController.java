@@ -18,6 +18,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
+import java.io.IOException;
 import java.util.Random;
 
 public class SocketConnectionController extends FXController {
@@ -83,7 +84,7 @@ public class SocketConnectionController extends FXController {
             try {
                 var mancalaSocket = new MancalaSocket(socketConnectionData, homeView);
                 new GameView(mancalaSocket).load();
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 ex.printStackTrace();
                 callback(true);
             }
