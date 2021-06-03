@@ -2,6 +2,8 @@ package fr.antoninhuaut.mancala.model;
 
 import fr.antoninhuaut.mancala.match.Game;
 import fr.antoninhuaut.mancala.match.Round;
+import fr.antoninhuaut.mancala.socket.cenum.ClientToServerEnum;
+import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,6 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -34,25 +37,29 @@ public class Player {
         this.nbRoundWin = 0;
     }
 
-    public void setup(Game game, boolean isPlayerOne) throws IOException, ClassNotFoundException {
+    public void waitSetup(Game game, boolean isPlayerOne) throws IOException, ClassNotFoundException {
         this.game = game;
         this.isPlayerOne = isPlayerOne;
 
         this.input = new ObjectInputStream(socket.getInputStream());
         this.output = new ObjectOutputStream(socket.getOutputStream());
 
-        String inputData = (String) input.readObject();
-        LOGGER.debug("SETUP: {}", inputData);
+        try {
+            String inputData = (String) input.readObject();
+            String[] arguments = inputData.split(" ");
+            LOGGER.debug("SETUP: {}", inputData);
 
-        String[] data = inputData.split(" ");
-        if (data[0].equals("CLIENT_INIT")) {
-            this.username = data[1];
+            var clientCommand = ClientToServerEnum.extractFromCommand(arguments[0]);
+            if (clientCommand == ClientToServerEnum.CLIENT_INIT) {
+                this.username = arguments[1];
+            }
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException ignored) {
         }
 
-        sendData("WELCOME PLAYER_" + (isPlayerOne ? "ONE" : "TWO"));
+        sendData(ServerToClientEnum.WELCOME, "PLAYER_" + (isPlayerOne ? "ONE" : "TWO"));
     }
 
-    public void runStart() {
+    public void listenClient() {
         try {
             processCommands();
         } catch (IOException | ClassNotFoundException ignored) {
@@ -69,13 +76,19 @@ public class Player {
 
     private void processCommands() throws IOException, ClassNotFoundException {
         while (true) {
-            String command = (String) input.readObject();
-            LOGGER.debug("Receive from {}: {}", username, command);
+            try {
+                String inputData = (String) input.readObject();
+                String[] arguments = inputData.split(" ");
+                LOGGER.debug("Receive from {}: {}", username, inputData);
 
-            if (command.startsWith("MOVE")) { // MOVE <line> <col>
-                String[] data = command.split(" ");
-                processMoveCommand(Integer.parseInt(data[1]), Integer.parseInt(data[2]));
-            } //
+                var clientCommand = ClientToServerEnum.extractFromCommand(arguments[0]);
+                if (clientCommand == ClientToServerEnum.MOVE) { // MOVE <line> <col>
+                    String[] data = inputData.split(" ");
+                    processMoveCommand(Integer.parseInt(data[1]), Integer.parseInt(data[2]));
+                } //
+            } catch (ArrayIndexOutOfBoundsException | NumberFormatException ignored) {
+                ignored.printStackTrace();
+            }
         }
     }
 
@@ -83,22 +96,21 @@ public class Player {
         try {
             game.getCurrentRound().play(this, line, col);
         } catch (IllegalStateException ex) {
-            sendData("MESSAGE " + ex.getMessage());
+            sendData(ServerToClientEnum.BAD_STATE, ex.getMessage());
         }
     }
 
-    public void sendData(String data) {
+    public void sendData(ServerToClientEnum data, String... args) {
         try {
-            output.writeObject(data);
-            output.flush();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            var strArgs = String.join(" ", args);
+            output.writeObject(data.name() + (strArgs.isEmpty() ? "" : " " + strArgs));
+        } catch (IOException ignored) {
         }
     }
 
     public void sendGameUpdate(Cell[][] cells, int turnPlayerId, int pOneScore, int pTwoScore) {
         try {
-            output.writeObject("GAME_UPDATE");
+            output.writeObject(ServerToClientEnum.GAME_UPDATE.name());
             output.writeInt(turnPlayerId);
             output.writeInt(pOneScore);
             output.writeInt(pTwoScore);
@@ -134,5 +146,18 @@ public class Player {
 
     public String getUsername() {
         return username;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        var player = (Player) o;
+        return this.isPlayerOne == player.isPlayerOne;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isPlayerOne);
     }
 }

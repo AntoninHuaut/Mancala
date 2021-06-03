@@ -2,6 +2,7 @@ package fr.antoninhuaut.mancala.match;
 
 import fr.antoninhuaut.mancala.model.Player;
 import fr.antoninhuaut.mancala.socket.Session;
+import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 
 import java.io.IOException;
 
@@ -37,29 +38,29 @@ public class Game {
             isPlayerOne = false;
         }
 
-        p.setup(this, isPlayerOne);
+        p.waitSetup(this, isPlayerOne);
 
         if (session.getNbPlayer() == 1) {
-            p.sendData("MESSAGE WAIT_OPPONENT");
+            p.sendData(ServerToClientEnum.WAIT_OPPONENT);
         } else {
             currentRound.initPostPlayersJoined();
-            pOne.sendData("OPPONENT_NAME " + pTwo.getUsername());
-            pTwo.sendData("OPPONENT_NAME " + pOne.getUsername());
+            pOne.sendData(ServerToClientEnum.OPPONENT_NAME, pTwo.getUsername());
+            pTwo.sendData(ServerToClientEnum.OPPONENT_NAME, pOne.getUsername());
         }
     }
 
     public synchronized void removePlayer(Player p) {
-        if (pOne != null && pOne.getPlayerId() == p.getPlayerId()) {
+        if (pOne != null && pOne.equals(p)) {
             pOne = null;
 
             if (pTwo != null) {
-                pTwo.sendData("MESSAGE WAIT_OPPONENT");
+                pTwo.sendData(ServerToClientEnum.WAIT_OPPONENT);
             }
-        } else if (pTwo != null && pTwo.getPlayerId() == p.getPlayerId()) {
+        } else if (pTwo != null && pTwo.equals(p)) {
             pTwo = null;
 
             if (pOne != null) {
-                pOne.sendData("MESSAGE WAIT_OPPONENT");
+                pOne.sendData(ServerToClientEnum.WAIT_OPPONENT);
             }
         }
     }
@@ -73,7 +74,7 @@ public class Game {
     }
 
     public Player getOppositePlayer(Player playerAtm) {
-        return playerAtm.getPlayerId() == getPOne().getPlayerId() ? getPTwo() : getPOne();
+        return playerAtm.equals(getPOne()) ? getPTwo() : getPOne();
     }
 
     public Round getCurrentRound() {

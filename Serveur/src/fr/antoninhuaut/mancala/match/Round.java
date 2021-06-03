@@ -3,6 +3,7 @@ package fr.antoninhuaut.mancala.match;
 import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.Move;
 import fr.antoninhuaut.mancala.model.Player;
+import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,8 +40,8 @@ public class Round {
             playerTurnId = new Random().nextInt(2); // Between 0 & 1
         }
         var currentPlayer = getCurrentPlayer();
-        currentPlayer.sendData("INIT_PLAYER YOU");
-        game.getOppositePlayer(currentPlayer).sendData("INIT_PLAYER OPPONENT");
+        currentPlayer.sendData(ServerToClientEnum.INIT_PLAYER, "YOU");
+        game.getOppositePlayer(currentPlayer).sendData(ServerToClientEnum.INIT_PLAYER, "OPPONENT");
 
         sendGameUpdate(currentPlayer);
     }
@@ -48,16 +49,16 @@ public class Round {
     public synchronized void play(Player player, int linePlayed, int colPlayed) {
         var currentPlayer = getCurrentPlayer();
         if (currentPlayer != player) {
-            throw new IllegalStateException("NOT_YOUR_TURN");
+            throw new IllegalStateException("NOT_YOUR_TURN"); // TODO CLIENT
         } else if (playerTurnId == null || linePlayed != player.getPlayerId()) {
-            throw new IllegalStateException("NOT_YOUR_CELL");
+            throw new IllegalStateException("NOT_YOUR_CELL"); // TODO CLIENT
         }
 
         lastMove = new Move(this, cells, currentPlayer);
         var moveEnum = lastMove.doMove(linePlayed, colPlayed);
         LOGGER.debug("Move: {}", moveEnum);
         if (!moveEnum.isSuccess()) {
-            // TODO message client
+            // TODO CLIENT
             return;
         }
 
@@ -67,8 +68,10 @@ public class Round {
         Optional<Player> optWinner = getWinner();
         if (optWinner.isPresent()) {
             Player winner = optWinner.get();
-            winner.sendData("END YOU_WIN");
-            game.getOppositePlayer(winner).sendData("END YOU_LOSE");
+
+            for (Player p : Arrays.asList(winner, game.getOppositePlayer(winner))) {
+                p.sendData(ServerToClientEnum.END_ROUND, "" + winner.getPlayerId()); // TODO CLIENT
+            }
             // TODO gestion 6 rounds/fin du jeu
         }
 
