@@ -8,6 +8,8 @@ import fr.antoninhuaut.mancala.model.views.socket.SocketConnectionData;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
 import javafx.application.Platform;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,7 +18,7 @@ import java.net.Socket;
 
 public class MancalaSocket {
 
-//    private static final Logger LOGGER = LoggerFactory.getLogger(MancalaSocket.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final int NB_LINE = 2;
     public static final int NB_COL = 6;
@@ -45,7 +47,7 @@ public class MancalaSocket {
             do {
                 String res = (String) in.readObject();
                 String[] arguments = res.split(" ");
-//                LOGGER.debug("Receive: {}", res);
+                LOGGER.debug("Receive: {}", res);
 
                 try {
                     analyseRequest(SocketExchangeEnum.valueOf(arguments[0]), arguments);

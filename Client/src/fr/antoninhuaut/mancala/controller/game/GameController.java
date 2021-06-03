@@ -6,20 +6,22 @@ import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
-import javafx.beans.binding.StringBinding;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Random;
 
 public class GameController extends FXController {
 
-//    private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final HomeView homeView;
     private final MancalaSocket mancalaSocket;
@@ -51,6 +53,8 @@ public class GameController extends FXController {
 
     @Override
     public void postLoad() {
+        LOGGER.debug("GameController postLoad");
+
         var random = new Random();
         for (ImageView bol : Arrays.asList(bol00, bol01, bol02, bol03, bol04, bol05, bol10, bol11, bol12, bol13, bol14, bol15)) {
             bol.setRotate(random.nextDouble() * 180);

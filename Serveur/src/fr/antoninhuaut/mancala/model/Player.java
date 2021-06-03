@@ -58,7 +58,6 @@ public class Player implements Runnable {
         }
 
         sendData("WELCOME PLAYER_" + (isPlayerOne ? "ONE" : "TWO"));
-        sendGameUpdate(game.getCurrentRound().getCells(), 0, 0, 0);
 
         if (isPlayerOne) {
             game.setPlayerOne(this);

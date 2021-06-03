@@ -31,15 +31,6 @@ public class Round {
                 cells[line][col] = new Cell(4);
             }
         }
-
-//        TESTING
-//        for (var line = 0; line < NB_LINE; ++line) {
-//            for (var col = 0; col < NB_COL; ++col) {
-//                int value = line == 0 ? 0 : 4;
-//                cells[line][col] = new Cell(value);
-//            }
-//        }
-//        cells[0][5].addSeed();
     }
 
     public void initPostPlayersJoined() {
@@ -47,6 +38,8 @@ public class Round {
         this.currentPlayer = new Random().nextBoolean() ? game.getPOne() : game.getPTwo();
         this.currentPlayer.sendData("INIT_PLAYER YOU");
         game.getOppositePlayer(currentPlayer).sendData("INIT_PLAYER OPPONENT");
+
+        sendGameUpdate(this.currentPlayer);
     }
 
     public synchronized void play(Player player, int linePlayed, int colPlayed) {
@@ -65,9 +58,7 @@ public class Round {
         }
 
         var nextPlayerTurn = game.getOppositePlayer(currentPlayer);
-        for (Player pLoop : Arrays.asList(currentPlayer, nextPlayerTurn)) {
-            pLoop.sendGameUpdate(cells, nextPlayerTurn.getPlayerId(), game.getPOne().getCurrentScore(), game.getPTwo().getCurrentScore());
-        }
+        sendGameUpdate(nextPlayerTurn);
 
         Optional<Player> optWinner = getWinner();
         if (optWinner.isPresent()) {
@@ -84,21 +75,20 @@ public class Round {
         lastMove.undoMove();
 
         var nextPlayerTurn = game.getOppositePlayer(currentPlayer);
-        for (Player pLoop : Arrays.asList(currentPlayer, nextPlayerTurn)) {
+        sendGameUpdate(nextPlayerTurn);
+        this.currentPlayer = nextPlayerTurn;
+    }
+
+    private void sendGameUpdate(Player nextPlayerTurn) {
+        for (Player pLoop : Arrays.asList(nextPlayerTurn, game.getOppositePlayer(nextPlayerTurn))) {
             pLoop.sendGameUpdate(cells, nextPlayerTurn.getPlayerId(), game.getPOne().getCurrentScore(), game.getPTwo().getCurrentScore());
         }
-
-        this.currentPlayer = nextPlayerTurn;
     }
 
     private Optional<Player> getWinner() {
         if (game.getPOne().hasWin()) return Optional.of(game.getPOne());
         else if (game.getPTwo().hasWin()) return Optional.of(game.getPTwo());
         return Optional.empty();
-    }
-
-    public Cell[][] getCells() {
-        return cells;
     }
 
     public Game getGame() {
