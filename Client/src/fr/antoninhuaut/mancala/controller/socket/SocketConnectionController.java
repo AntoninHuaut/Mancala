@@ -85,7 +85,6 @@ public class SocketConnectionController extends FXController {
                 var mancalaSocket = new MancalaSocket(socketConnectionData, homeView);
                 new GameView(mancalaSocket).load();
             } catch (IOException ex) {
-                ex.printStackTrace();
                 callback(true);
             }
         }).start();

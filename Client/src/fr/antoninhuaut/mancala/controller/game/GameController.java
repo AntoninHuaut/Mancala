@@ -3,9 +3,14 @@ package fr.antoninhuaut.mancala.controller.game;
 import fr.antoninhuaut.mancala.controller.global.FXController;
 import fr.antoninhuaut.mancala.controller.socket.MancalaSocket;
 import fr.antoninhuaut.mancala.model.Cell;
+import fr.antoninhuaut.mancala.model.views.game.GameData;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -18,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class GameController extends FXController {
@@ -47,6 +53,8 @@ public class GameController extends FXController {
     private int myPlayerId;
     private boolean isYourTurn = false;
 
+    private GameData gameData;
+
     public GameController(MancalaSocket mancalaSocket) {
         this.homeView = mancalaSocket.getHomeView();
         this.mancalaSocket = mancalaSocket;
@@ -56,20 +64,64 @@ public class GameController extends FXController {
     public void postLoad() {
         LOGGER.debug("GameController postLoad");
 
-        var random = new Random();
-        for (ImageView bol : Arrays.asList(bol00, bol01, bol02, bol03, bol04, bol05, bol10, bol11, bol12, bol13, bol14, bol15)) {
-            bol.setRotate(random.nextDouble() * 180);
+        if (gameData == null) {
+            gameData = new GameData();
+            waitOpponent();
+
+            new Thread(() -> {
+                try {
+                    mancalaSocket.start(this);
+                } catch (IOException ignored) {
+                    new SocketConnectionView(homeView).load();
+                }
+            }).start();
         }
 
-        waitOpponent();
+        bindGameProperties();
+    }
 
-        new Thread(() -> {
-            try {
-                mancalaSocket.start(this);
-            } catch (IOException ignored) {
-                new SocketConnectionView(homeView).load();
+    private void bindGameProperties() {
+        var random = new Random();
+        List<ImageView> bolList = Arrays.asList(bol00, bol01, bol02, bol03, bol04, bol05, bol10, bol11, bol12, bol13, bol14, bol15);
+        for (var i = 0; i < bolList.size(); i++) {
+            var bol = bolList.get(i);
+
+            if (gameData.getBols()[i] == null) {
+                gameData.getBols()[i] = new SimpleDoubleProperty();
+                gameData.getBols()[i].set(random.nextDouble() * 180);
             }
-        }).start();
+
+            bol.rotateProperty().bind(gameData.getBols()[i]);
+        }
+
+        for (ImageView arrowPlayer : Arrays.asList(arrowPlayerOne, arrowPlayerTwo)) {
+            arrowPlayer.setRotate(3);
+        }
+
+        for (var line = 0; line < 2; ++line) {
+            for (var col = 0; col < 6; ++col) {
+                var cellLabel = (Label) gameGrid.getScene().lookup(String.format("#cell-%d-%d", line, col));
+
+                if (gameData.getCells()[line][col] == null) gameData.getCells()[line][col] = new SimpleStringProperty();
+                cellLabel.textProperty().bind(gameData.getCells()[line][col]);
+            }
+        }
+
+        gameGrid.visibleProperty().bind(gameData.gameGridVisibilityProperty());
+        infosLabel.textFillProperty().bind(gameData.infosLabelColorProperty());
+
+        if (gameData.infosLabelTextProperty() != null) {
+            if (infosLabel.textProperty().isBound()) infosLabel.textProperty().unbind();
+            infosLabel.textProperty().bind(gameData.infosLabelTextProperty());
+        }
+
+        playersNameLabel.visibleProperty().bind(gameData.playersNameLabelVisiblityProperty());
+        playersNameLabel.textProperty().bind(gameData.playersNameLabelTextProperty());
+        pOneScoreLabel.textProperty().bind(gameData.pOneScoreLabelTextProperty());
+        pTwoScoreLabel.textProperty().bind(gameData.pTwoScoreLabelTextProperty());
+        
+        stackPlayerOne.visibleProperty().bind(gameData.stackPlayerOneVisibilityProperty());
+        stackPlayerTwo.visibleProperty().bind(gameData.stackPlayerTwoVisibilityProperty());
     }
 
     @FXML
@@ -92,20 +144,17 @@ public class GameController extends FXController {
     }
 
     public void updateGameState(Cell[][] cells, int playerTurnId, int pOneScore, int pTwoScore) {
-        var scene = infosLabel.getScene();
-//        LOGGER.debug("Updating game state [playerTurnId: {}, pOneScore: {}, pTwoScore: {}]",
-//                playerTurnId, pOneScore, pTwoScore);
+        LOGGER.debug("Updating game state [playerTurnId: {}, pOneScore: {}, pTwoScore: {}]", playerTurnId, pOneScore, pTwoScore);
 
         for (var line = 0; line < cells.length; ++line) {
             for (var col = 0; col < cells[line].length; ++col) {
                 var cell = cells[line][col];
-                var cellLabel = (Label) scene.lookup(String.format("#cell-%d-%d", line, col));
-                cellLabel.setText("" + cell.getNbSeed());
+                gameData.getCells()[line][col].set("" + cell.getNbSeed());
             }
         }
 
-        pOneScoreLabel.setText("" + pOneScore);
-        pTwoScoreLabel.setText("" + pTwoScore);
+        gameData.pOneScoreLabelTextProperty().set("" + pOneScore);
+        gameData.pTwoScoreLabelTextProperty().set("" + pTwoScore);
 
         this.isYourTurn = playerTurnId == myPlayerId;
         setTurnLabel();
@@ -115,19 +164,17 @@ public class GameController extends FXController {
         boolean isPlayerOne = playerNumberResponse.equalsIgnoreCase("player_one");
         if (isPlayerOne) {
             this.myPlayerId = 0;
-            this.arrowPlayerOne.setRotate(arrowPlayerOne.getRotate() + 3);
-            this.stackPlayerTwo.setVisible(false);
+            gameData.stackPlayerTwoVisibilityProperty().set(false);
         } else {
             this.myPlayerId = 1;
-            this.arrowPlayerTwo.setRotate(arrowPlayerTwo.getRotate() + 3);
-            this.stackPlayerOne.setVisible(false);
+            gameData.stackPlayerOneVisibilityProperty().set(false);
         }
     }
 
     public void initPostPlayerJoin(boolean isYourTurn) {
         this.isYourTurn = isYourTurn;
         setTurnLabel();
-        gameGrid.setVisible(true);
+        gameData.gameGridVisibilityProperty().set(true);
     }
 
     public void setTurnLabel() {
@@ -139,22 +186,23 @@ public class GameController extends FXController {
     }
 
     public void waitOpponent() {
-        playersNameLabel.setVisible(false);
-        gameGrid.setVisible(false);
+        gameData.playersNameLabelVisiblityProperty().set(false);
+        gameData.gameGridVisibilityProperty().set(false);
         setInfosLabelI18N("game.info.wait_opponent", "#000000");
     }
 
     public void setPlayersName(String opponentName) {
-        playersNameLabel.setVisible(true);
-        playersNameLabel.setText(mancalaSocket.getUsername() + " VS " + opponentName);
+        gameData.playersNameLabelVisiblityProperty().set(true);
+        gameData.playersNameLabelTextProperty().set(mancalaSocket.getUsername() + " VS " + opponentName);
     }
 
     public void setInfosLabelI18N(String i18nKey, String hexColor) {
         if (infosLabel.textProperty().isBound()) infosLabel.textProperty().unbind();
-        infosLabel.textProperty().bind(I18NUtils.getInstance().bindStr(i18nKey));
+        gameData.setInfosLabelTextProperty(I18NUtils.getInstance().bindStr(i18nKey));
+        infosLabel.textProperty().bind(gameData.infosLabelTextProperty());
 
         if (hexColor != null) {
-            infosLabel.setTextFill(Color.web(hexColor));
+            gameData.infosLabelColorProperty().set(Color.web(hexColor));
         }
     }
 }

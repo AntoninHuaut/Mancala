@@ -4,5 +4,6 @@ public enum UserPrefType {
 
     USERNAME,
     SOCKET_HOST,
-    SOCKET_PORT
+    SOCKET_PORT,
+    LOCALE_PREF
 }

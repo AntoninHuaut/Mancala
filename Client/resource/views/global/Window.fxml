@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 
 <AnchorPane prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: white;" stylesheets="@../GlobalRoot.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
@@ -23,6 +24,27 @@
          <children>
             <HBox alignment="CENTER_RIGHT" spacing="15.0" GridPane.rowIndex="1">
                <children>
+                  <StackPane alignment="CENTER_RIGHT">
+                     <children>
+                        <ImageView fx:id="enFlag" fitHeight="33.0" fitWidth="33.0" onMouseClicked="#onENFlagClick" pickOnBounds="true" preserveRatio="true" styleClass="clickable">
+                           <image>
+                              <Image url="@../../img/flags/flag-en.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="frFlag" fitHeight="33.0" fitWidth="33.0" onMouseClicked="#onFRFlagClick" pickOnBounds="true" preserveRatio="true" styleClass="clickable">
+                           <image>
+                              <Image url="@../../img/flags/flag-fr.png" />
+                           </image>
+                           <StackPane.margin>
+                              <Insets />
+                           </StackPane.margin>
+                        </ImageView>
+                     </children>
+                     <padding>
+                        <Insets bottom="1.0" left="2.0" top="2.0" />
+                     </padding>
+                  </StackPane>
+                  <Region HBox.hgrow="ALWAYS" />
                   <ImageView fx:id="homeIcon" fitHeight="32.0" fitWidth="33.0" onMouseClicked="#onHomeMenuClick" pickOnBounds="true" preserveRatio="true" styleClass="clickable">
                      <image>
                         <Image url="@../../img/toolbar/home.png" />
@@ -31,7 +53,6 @@
                         <Insets bottom="1.0" left="2.0" right="2.0" top="2.0" />
                      </HBox.margin>
                   </ImageView>
-                  <Region HBox.hgrow="ALWAYS" />
                   <ImageView fx:id="helpIcon" fitHeight="33.0" fitWidth="33.0" pickOnBounds="true" preserveRatio="true" styleClass="clickable">
                      <image>
                         <Image url="@../../img/toolbar/help.png" />
