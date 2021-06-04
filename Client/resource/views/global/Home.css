@@ -1,23 +1,23 @@
 .button {
-    -fx-background-color: #0D6EFD;
+    -fx-background-color: #9D7E68;
     -fx-background-radius: 5;
     -fx-text-fill: white;
 }
 
 .button:hover {
-    -fx-background-color: #FFA555;
+    -fx-background-color: #C39C81;
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
     -fx-scale-z: 1.05;
 }
 
 .button:pressed {
-    -fx-background-color: #0D6EFD;
+    -fx-background-color: #9D7E68;
 }
 
 .separator *.line {
-    -fx-background-color: #FFA555;
-    -fx-border-color: #FFA555;
+    -fx-background-color: #C39C81;
+    -fx-border-color: #C39C81;
     -fx-border-style: solid;
     -fx-border-width: 1px;
 }

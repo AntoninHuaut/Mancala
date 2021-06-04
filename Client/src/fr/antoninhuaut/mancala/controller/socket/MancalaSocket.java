@@ -141,4 +141,8 @@ public class MancalaSocket {
     public HomeView getHomeView() {
         return homeView;
     }
+
+    public GameController getGameController() {
+        return gameController;
+    }
 }

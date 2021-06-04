@@ -4,6 +4,7 @@ public enum ClientToServerEnum {
 
     CLIENT_INIT,
     MOVE,
+    UNDO,
     UNKNOWN;
 
     public static ClientToServerEnum extractFromCommand(String data) {

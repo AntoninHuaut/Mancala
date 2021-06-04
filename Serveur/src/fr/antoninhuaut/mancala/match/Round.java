@@ -88,13 +88,18 @@ public class Round {
         }
     }
 
-    public void undo() {
+    public void undo(int playerId) {
+        if (lastMove == null || playerTurnId == -1 || playerId == playerTurnId) {
+            throw new IllegalStateException(ServerToClientEnum.BadStateEnum.CANT_UNDO_NOW.name());
+        }
+
         lastMove.undoMove();
 
         var currentPlayer = getCurrentPlayer();
         var nextPlayerTurn = game.getOppositePlayer(currentPlayer);
         sendGameUpdate(nextPlayerTurn);
         this.playerTurnId = nextPlayerTurn.getPlayerId();
+        this.lastMove = null; // Prevent double undo
     }
 
     private void sendGameUpdate(Player nextPlayerTurn) {

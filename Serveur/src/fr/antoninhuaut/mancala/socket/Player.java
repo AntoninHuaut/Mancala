@@ -78,18 +78,15 @@ public class Player {
                 var clientCommand = ClientToServerEnum.extractFromCommand(arguments[0]);
                 if (clientCommand == ClientToServerEnum.MOVE) { // MOVE <line> <col>
                     String[] data = inputData.split(" ");
-                    processMoveCommand(Integer.parseInt(data[1]), Integer.parseInt(data[2]));
+                    game.getCurrentRound().play(this, Integer.parseInt(data[1]), Integer.parseInt(data[2]));
+                } //
+                else if (clientCommand == ClientToServerEnum.UNDO) {
+                    game.getCurrentRound().undo(getPlayerId());
                 } //
             } catch (ArrayIndexOutOfBoundsException | NumberFormatException ignored) {
+            } catch (IllegalStateException ex) {
+                sendData(ServerToClientEnum.BAD_STATE, ex.getMessage());
             }
-        }
-    }
-
-    private void processMoveCommand(int line, int col) {
-        try {
-            game.getCurrentRound().play(this, line, col);
-        } catch (IllegalStateException ex) {
-            sendData(ServerToClientEnum.BAD_STATE, ex.getMessage());
         }
     }
 

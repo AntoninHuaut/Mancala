@@ -22,6 +22,7 @@ public enum ServerToClientEnum {
 
     public enum BadStateEnum {
         NOT_YOUR_TURN,
+        CANT_UNDO_NOW,
         NOT_YOUR_CELL;
     }
 }
