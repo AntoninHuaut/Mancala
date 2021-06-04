@@ -80,6 +80,9 @@ public class Player {
                     String[] data = inputData.split(" ");
                     game.getCurrentRound().play(this, Integer.parseInt(data[1]), Integer.parseInt(data[2]));
                 } //
+                else if (clientCommand == ClientToServerEnum.STOP_MATCH) {
+                    game.endGame();
+                } //
                 else if (clientCommand == ClientToServerEnum.UNDO) {
                     game.getCurrentRound().undo(getPlayerId());
                 } //

@@ -4,9 +4,11 @@ public enum ClientToServerEnum {
 
     CLIENT_INIT,
     MOVE,
-    UNDO,
-    UNKNOWN;
 
+    UNDO,
+    STOP_MATCH,
+
+    UNKNOWN;
     public static ClientToServerEnum extractFromCommand(String data) {
         try {
             return ClientToServerEnum.valueOf(data);

@@ -46,6 +46,8 @@ public class Round {
     }
 
     public synchronized void play(Player player, int linePlayed, int colPlayed) {
+        if (game.isGameFinished()) return;
+
         if (playerTurnId != player.getPlayerId()) {
             throw new IllegalStateException(ServerToClientEnum.BadStateEnum.NOT_YOUR_TURN.name());
         } else if (playerTurnId == null || linePlayed != player.getPlayerId()) {
@@ -89,6 +91,8 @@ public class Round {
     }
 
     public void undo(int playerId) {
+        if (game.isGameFinished()) return;
+
         if (lastMove == null || playerTurnId == -1 || playerId == playerTurnId) {
             throw new IllegalStateException(ServerToClientEnum.BadStateEnum.CANT_UNDO_NOW.name());
         }

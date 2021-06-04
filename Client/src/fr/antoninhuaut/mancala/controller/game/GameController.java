@@ -250,7 +250,7 @@ public class GameController extends FXController {
 
     public void setWinnerMatch(int winnerId) {
         gameData.gameGridVisibilityProperty().set(false);
-        if (myPlayerId == -1) {
+        if (winnerId == -1) {
             setInfosLabel("game.end.match.tie", "#00B2EE");
         } else if (myPlayerId == winnerId) {
             setInfosLabel("game.end.match.win", "#4caf50");

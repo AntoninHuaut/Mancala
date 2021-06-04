@@ -34,7 +34,6 @@ public class Game {
         resetPlayers();
 
         if (nbRound >= 6) {
-            isGameFinished = true;
             endGame();
         } else {
             nbRound++;
@@ -43,14 +42,20 @@ public class Game {
         }
     }
 
-    private void endGame() {
+    public void endGame() {
+        this.isGameFinished = true;
         PlayerData[] pData = getPlayersData();
 
-        int winnerId = -1;
-        if (pData[0].getNbRoundWin() > 3) {
+        int winnerId;
+        var roundOneWin = pData[0].getNbRoundWin();
+        var roundTwoWin = pData[1].getNbRoundWin();
+
+        if (roundOneWin > roundTwoWin) {
             winnerId = 0;
-        } else if (pData[1].getNbRoundWin() > 3) {
+        } else if (roundTwoWin > roundOneWin) {
             winnerId = 1;
+        } else {
+            winnerId = -1;
         }
 
         for (Player p : Arrays.asList(pOne, pTwo)) {
@@ -110,6 +115,10 @@ public class Game {
                 pOne.sendData(ServerToClientEnum.WAIT_OPPONENT);
             }
         }
+    }
+
+    public boolean isGameFinished() {
+        return isGameFinished;
     }
 
     public Player getPOne() {

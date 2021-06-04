@@ -31,6 +31,11 @@ public class HomeController extends FXController {
         mancalaSocket.get().sendData(ClientToServerEnum.UNDO);
     }
 
+    @FXML
+    public void stopMatch() {
+        mancalaSocket.get().sendData(ClientToServerEnum.STOP_MATCH);
+    }
+
     public void setMancalaSocket(MancalaSocket mancalaSocket) {
         this.mancalaSocket.set(mancalaSocket);
     }
