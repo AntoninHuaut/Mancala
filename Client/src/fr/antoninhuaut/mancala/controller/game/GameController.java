@@ -25,6 +25,10 @@ import java.util.*;
 
 public class GameController extends FXController {
 
+    private static final String BLACK_COLOR = "#000000";
+    private static final String GREEN_COLOR = "#4caf50";
+    private static final String RED_COLOR = "#FF0000";
+    private static final String BLUE_COLOR = "#00B2EE";
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final HomeView homeView;
@@ -190,16 +194,16 @@ public class GameController extends FXController {
 
     public void setTurnLabel() {
         if (isYourTurn) {
-            setInfosLabel("game.info.turn_you", "#4caf50");
+            setInfosLabel("game.info.turn_you", GREEN_COLOR);
         } else {
-            setInfosLabel("game.info.turn_opponent", "#00B2EE");
+            setInfosLabel("game.info.turn_opponent", BLUE_COLOR);
         }
     }
 
     public void waitOpponent() {
         gameData.playersNameLabelVisiblityProperty().set(false);
         gameData.gameGridVisibilityProperty().set(false);
-        setInfosLabel("game.info.wait_opponent", "#000000");
+        setInfosLabel("game.info.wait_opponent", BLACK_COLOR);
     }
 
     public void setPlayersName(String opponentName) {
@@ -240,22 +244,22 @@ public class GameController extends FXController {
 
     public void setWinnerRound(int winnerId) {
         if (myPlayerId == -1) {
-            setInfosLabel("game.end.round.tie", "#00B2EE");
+            setInfosLabel("game.end.round.tie", BLUE_COLOR);
         } else if (myPlayerId == winnerId) {
-            setInfosLabel("game.end.round.win", "#4caf50");
+            setInfosLabel("game.end.round.win", GREEN_COLOR);
         } else {
-            setInfosLabel("game.end.round.lose", "#FF0000");
+            setInfosLabel("game.end.round.lose", RED_COLOR);
         }
     }
 
     public void setWinnerMatch(int winnerId) {
         gameData.gameGridVisibilityProperty().set(false);
         if (winnerId == -1) {
-            setInfosLabel("game.end.match.tie", "#00B2EE");
+            setInfosLabel("game.end.match.tie", BLUE_COLOR);
         } else if (myPlayerId == winnerId) {
-            setInfosLabel("game.end.match.win", "#4caf50");
+            setInfosLabel("game.end.match.win", GREEN_COLOR);
         } else {
-            setInfosLabel("game.end.match.lose", "#FF0000");
+            setInfosLabel("game.end.match.lose", RED_COLOR);
         }
     }
 
