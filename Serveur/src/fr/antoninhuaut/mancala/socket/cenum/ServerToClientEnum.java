@@ -9,6 +9,7 @@ public enum ServerToClientEnum {
     OPPONENT_NAME,
     BAD_STATE,
     END_ROUND,
+    END_GAME,
     UNKNOWN;
 
     public static ServerToClientEnum extractFromCommand(String data) {

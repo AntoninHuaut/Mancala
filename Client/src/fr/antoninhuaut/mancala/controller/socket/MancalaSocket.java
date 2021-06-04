@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Locale;
 
 public class MancalaSocket {
 
@@ -82,7 +81,11 @@ public class MancalaSocket {
         } //
         else if (sEnum == ServerToClientEnum.END_ROUND) {
             final var winnerId = Integer.parseInt(args[1]);
-            fx(() -> gameController.setWinner(winnerId));
+            fx(() -> gameController.setWinnerRound(winnerId));
+        } //
+        else if (sEnum == ServerToClientEnum.END_GAME) {
+            final var winnerId = Integer.parseInt(args[1]);
+            fx(() -> gameController.setWinnerMatch(winnerId));
         } //
         else if (sEnum == ServerToClientEnum.GAME_UPDATE) {
             var playerTurnId = input.readInt();

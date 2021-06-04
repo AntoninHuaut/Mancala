@@ -6,18 +6,19 @@ import fr.antoninhuaut.mancala.socket.Session;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Game {
 
     private Player pOne;
     private Player pTwo;
 
-    private PlayerData[] playersData = new PlayerData[2];
-
+    private final PlayerData[] playersData = new PlayerData[2];
     private final Session session;
 
     private Round currentRound;
     private int nbRound;
+    private boolean isGameFinished = false;
 
     public Game(Session session) {
         this.session = session;
@@ -30,13 +31,32 @@ public class Game {
     }
 
     public void nextRound() {
-        if (nbRound == 6) {
-            // TODO
+        resetPlayers();
+
+        if (nbRound >= 6) {
+            isGameFinished = true;
+            endGame();
         } else {
-            resetPlayers();
             nbRound++;
             this.currentRound = new Round(this);
             sendGlobalUpdate();
+        }
+    }
+
+    private void endGame() {
+        PlayerData[] pData = getPlayersData();
+
+        int winnerId = -1;
+        if (pData[0].getNbRoundWin() > 3) {
+            winnerId = 0;
+        } else if (pData[1].getNbRoundWin() > 3) {
+            winnerId = 1;
+        }
+
+        for (Player p : Arrays.asList(pOne, pTwo)) {
+            if (p != null) {
+                p.sendData(ServerToClientEnum.END_GAME, "" + winnerId);
+            }
         }
     }
 
@@ -61,8 +81,12 @@ public class Game {
     }
 
     private synchronized void sendGlobalUpdate() {
-        var nbPlayer = session.getNbPlayer();
+        if (isGameFinished) {
+            endGame();
+            return;
+        }
 
+        var nbPlayer = session.getNbPlayer();
         if (nbPlayer == 1) {
             (pOne != null ? pOne : pTwo).sendData(ServerToClientEnum.WAIT_OPPONENT);
         } else if (nbPlayer == 2) {

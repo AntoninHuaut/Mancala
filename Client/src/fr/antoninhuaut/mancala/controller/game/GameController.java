@@ -238,13 +238,24 @@ public class GameController extends FXController {
         gameData.pTwoMatchLabelTextProperty().set("" + pTwoMatchWin);
     }
 
-    public void setWinner(int winnerId) {
+    public void setWinnerRound(int winnerId) {
         if (myPlayerId == -1) {
             setInfosLabel("game.end.round.tie", "#00B2EE");
         } else if (myPlayerId == winnerId) {
             setInfosLabel("game.end.round.win", "#4caf50");
         } else {
             setInfosLabel("game.end.round.lose", "#FF0000");
+        }
+    }
+
+    public void setWinnerMatch(int winnerId) {
+        gameData.gameGridVisibilityProperty().set(false);
+        if (myPlayerId == -1) {
+            setInfosLabel("game.end.match.tie", "#00B2EE");
+        } else if (myPlayerId == winnerId) {
+            setInfosLabel("game.end.match.win", "#4caf50");
+        } else {
+            setInfosLabel("game.end.match.lose", "#FF0000");
         }
     }
 

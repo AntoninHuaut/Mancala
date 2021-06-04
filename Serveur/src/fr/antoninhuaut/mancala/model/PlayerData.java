@@ -19,7 +19,7 @@ public class PlayerData {
         return playerId;
     }
 
-    public boolean hasWin() {
+    public boolean hasWinRound() {
         return currentScore >= 25;
     }
 

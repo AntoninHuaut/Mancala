@@ -46,14 +46,17 @@ public class Round {
     }
 
     public synchronized void play(Player player, int linePlayed, int colPlayed) {
-        var currentPlayer = getCurrentPlayer();
-        if (currentPlayer != player) {
+        if (playerTurnId != player.getPlayerId()) {
             throw new IllegalStateException(ServerToClientEnum.BadStateEnum.NOT_YOUR_TURN.name());
         } else if (playerTurnId == null || linePlayed != player.getPlayerId()) {
             throw new IllegalStateException(ServerToClientEnum.BadStateEnum.NOT_YOUR_CELL.name());
         }
 
-        this.lastMove = new Move(this, cells, game.getPlayersData()[currentPlayer.getPlayerId()]);
+        var currentPlayer = getCurrentPlayer();
+        var pData = game.getPlayersData()[currentPlayer.getPlayerId()];
+
+        this.lastMove = new Move(this, cells, pData);
+
         var moveEnum = this.lastMove.doMove(linePlayed, colPlayed);
         LOGGER.debug("Move: {} - isSuccess: {}", moveEnum, moveEnum.isSuccess());
         if (!moveEnum.isSuccess()) {
@@ -72,7 +75,7 @@ public class Round {
             }
 
             game.getPlayersData()[winner.getPlayerId()].addWinRound();
-            this.playerTurnId = -1; // Empêche toute futur action
+            this.playerTurnId = -1; // Empêche toute futur action sur ce round (qui est terminé)
 
             new Timer().schedule(new TimerTask() {
                 @Override
@@ -109,8 +112,8 @@ public class Round {
         }
 
         // Gagnant par points
-        if (playerData[0].hasWin()) return Optional.of(game.getPOne());
-        else if (playerData[1].hasWin()) return Optional.of(game.getPTwo());
+        if (playerData[0].hasWinRound()) return Optional.of(game.getPOne());
+        else if (playerData[1].hasWinRound()) return Optional.of(game.getPTwo());
         return Optional.empty();
     }
 
