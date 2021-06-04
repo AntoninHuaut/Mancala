@@ -34,13 +34,18 @@ public class Round {
     }
 
     public void initPostPlayersJoined() {
-        // SET CURRENT PLAYER
         if (playerTurnId == null) {
-            playerTurnId = new Random().nextInt(2); // Between 0 & 1
+            playerTurnId = new Random().nextInt(2);
         }
+
         var currentPlayer = getCurrentPlayer();
+        if (currentPlayer == null) return;
+
+        var oppositePlayer = game.getSession().getOppositePlayer(currentPlayer);
+        if (oppositePlayer == null) return;
+
         currentPlayer.sendData(ServerToClientEnum.INIT_PLAYER, "YOU");
-        game.getOppositePlayer(currentPlayer).sendData(ServerToClientEnum.INIT_PLAYER, "OPPONENT");
+        oppositePlayer.sendData(ServerToClientEnum.INIT_PLAYER, "OPPONENT");
 
         sendGameUpdate(currentPlayer);
     }
@@ -48,14 +53,15 @@ public class Round {
     public synchronized void play(Player player, int linePlayed, int colPlayed) {
         if (game.isGameFinished()) return;
 
-        if (playerTurnId != player.getPlayerId()) {
+        var currentPlayer = getCurrentPlayer();
+
+        if (playerTurnId != player.getPlayerId() || currentPlayer == null) {
             throw new IllegalStateException(ServerToClientEnum.BadStateEnum.NOT_YOUR_TURN.name());
         } else if (playerTurnId == null || linePlayed != player.getPlayerId()) {
             throw new IllegalStateException(ServerToClientEnum.BadStateEnum.NOT_YOUR_CELL.name());
         }
 
-        var currentPlayer = getCurrentPlayer();
-        var pData = game.getPlayersData()[currentPlayer.getPlayerId()];
+        var pData = game.getSession().getPlayersData()[currentPlayer.getPlayerId()];
 
         this.lastMove = new Move(this, cells, pData);
 
@@ -65,18 +71,18 @@ public class Round {
             throw new IllegalStateException(moveEnum.name());
         }
 
-        var nextPlayerTurn = game.getOppositePlayer(currentPlayer);
+        var nextPlayerTurn = game.getSession().getOppositePlayer(currentPlayer);
         sendGameUpdate(nextPlayerTurn);
 
-        Optional<Player> optWinner = getWinner(moveEnum);
+        Optional<Integer> optWinner = getWinnerId(moveEnum);
         if (optWinner.isPresent()) {
-            Player winner = optWinner.get();
+            Integer winnerId = optWinner.get();
 
-            for (Player p : Arrays.asList(winner, game.getOppositePlayer(winner))) {
-                p.sendData(ServerToClientEnum.END_ROUND, "" + winner.getPlayerId());
+            for (Player p : game.getSession().getNoNullPlayers()) {
+                p.sendData(ServerToClientEnum.END_ROUND, "" + winnerId);
             }
 
-            game.getPlayersData()[winner.getPlayerId()].addWinRound();
+            game.getSession().getPlayersData()[winnerId].addWinRound();
             this.playerTurnId = -1; // Empêche toute futur action sur ce round (qui est terminé)
 
             new Timer().schedule(new TimerTask() {
@@ -100,29 +106,32 @@ public class Round {
         lastMove.undoMove();
 
         var currentPlayer = getCurrentPlayer();
-        var nextPlayerTurn = game.getOppositePlayer(currentPlayer);
+        var nextPlayerTurn = game.getSession().getOppositePlayer(currentPlayer);
         sendGameUpdate(nextPlayerTurn);
         this.playerTurnId = nextPlayerTurn.getPlayerId();
         this.lastMove = null; // Prevent double undo
     }
 
     private void sendGameUpdate(Player nextPlayerTurn) {
-        for (Player pLoop : Arrays.asList(nextPlayerTurn, game.getOppositePlayer(nextPlayerTurn))) {
-            pLoop.sendGameUpdate(cells, nextPlayerTurn.getPlayerId(), game.getPlayersData());
+        if (nextPlayerTurn == null) return;
+
+        for (Player pLoop : game.getSession().getNoNullPlayers()) {
+            pLoop.sendGameUpdate(cells, nextPlayerTurn.getPlayerId(), game.getSession().getPlayersData());
         }
     }
 
-    private Optional<Player> getWinner(MoveEnum moveEnum) {
-        var playerData = game.getPlayersData();
+    private Optional<Integer> getWinnerId(MoveEnum moveEnum) {
+        var playerData = game.getSession().getPlayersData();
 
         // Gagnant si l'opposant ne peut plus jouer
         if (moveEnum == MoveEnum.SUCCESS_AND_WIN_OPPONENT_CANT_PLAY) {
-            return Optional.of(getCurrentPlayer());
+            var currentPlayer = getCurrentPlayer();
+            return currentPlayer != null ? Optional.of(currentPlayer.getPlayerId()) : Optional.of(-1);
         }
 
         // Gagnant par points
-        if (playerData[0].hasWinRound()) return Optional.of(game.getPOne());
-        else if (playerData[1].hasWinRound()) return Optional.of(game.getPTwo());
+        if (playerData[0].hasWinRound()) return Optional.of(0);
+        else if (playerData[1].hasWinRound()) return Optional.of(1);
         return Optional.empty();
     }
 
@@ -131,7 +140,8 @@ public class Round {
     }
 
     private Player getPlayerById(int id) {
-        if (id == 0) return game.getPOne();
-        else return game.getPTwo();
+        if (id == 0) return game.getSession().getPOne();
+        else if (id == 1) return game.getSession().getPTwo();
+        else return null;
     }
 }

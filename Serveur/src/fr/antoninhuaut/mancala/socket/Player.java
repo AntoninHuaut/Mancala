@@ -1,6 +1,5 @@
 package fr.antoninhuaut.mancala.socket;
 
-import fr.antoninhuaut.mancala.match.Game;
 import fr.antoninhuaut.mancala.match.Round;
 import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.PlayerData;
@@ -25,14 +24,14 @@ public class Player {
 
     /* Init by Game */
     private boolean isPlayerOne;
-    private Game game;
+    private Session session;
 
     public Player(Socket socket) {
         this.socket = socket;
     }
 
-    public void waitSetup(Game game, boolean isPlayerOne) throws IOException, ClassNotFoundException {
-        this.game = game;
+    public void waitSessionSetup(Session session, boolean isPlayerOne) throws IOException, ClassNotFoundException {
+        this.session = session;
         this.isPlayerOne = isPlayerOne;
 
         this.input = new ObjectInputStream(socket.getInputStream());
@@ -45,11 +44,13 @@ public class Player {
 
             var clientCommand = ClientToServerEnum.extractFromCommand(arguments[0]);
             if (clientCommand == ClientToServerEnum.CLIENT_INIT) {
-                this.game.setPlayerName(getPlayerId(), arguments[1]);
+                this.session.setPlayerName(getPlayerId(), arguments[1]);
             }
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException ignored) {
         }
+    }
 
+    public void gameSetup() {
         sendData(ServerToClientEnum.WELCOME, "PLAYER_" + (isPlayerOne ? "ONE" : "TWO"));
     }
 
@@ -58,8 +59,8 @@ public class Player {
             processCommands();
         } catch (IOException | ClassNotFoundException ignored) {
         } finally {
-            LOGGER.debug("Player{} quit", getPlayerId());
-            game.getSession().removePlayer(this);
+            LOGGER.debug("{}/{} quit", session.getPlayersData()[getPlayerId()].getUsername(), getPlayerId());
+            session.removePlayer(this);
 
             try {
                 socket.close();
@@ -73,19 +74,26 @@ public class Player {
             try {
                 String inputData = (String) input.readObject();
                 String[] arguments = inputData.split(" ");
-                LOGGER.debug("Receive from Player{}: {}", getPlayerId(), inputData);
+                LOGGER.debug("Receive from {}/{}: {}", session.getPlayersData()[getPlayerId()].getUsername(), getPlayerId(), inputData);
 
                 var clientCommand = ClientToServerEnum.extractFromCommand(arguments[0]);
-                if (clientCommand == ClientToServerEnum.MOVE) { // MOVE <line> <col>
-                    String[] data = inputData.split(" ");
-                    game.getCurrentRound().play(this, Integer.parseInt(data[1]), Integer.parseInt(data[2]));
-                } //
-                else if (clientCommand == ClientToServerEnum.STOP_MATCH) {
-                    game.endGame();
-                } //
-                else if (clientCommand == ClientToServerEnum.UNDO) {
-                    game.getCurrentRound().undo(getPlayerId());
-                } //
+                switch (clientCommand) {
+                    case MOVE:
+                        var data = inputData.split(" ");
+                        session.getGame().getCurrentRound().play(this, Integer.parseInt(data[1]), Integer.parseInt(data[2]));
+                        break;
+                    case NEW_MATCH:
+                        session.newGame();
+                        break;
+                    case STOP_MATCH:
+                        session.getGame().forceStopMatch();
+                        break;
+                    case UNDO:
+                        session.getGame().getCurrentRound().undo(getPlayerId());
+                        break;
+                    default:
+                        break;
+                }
             } catch (ArrayIndexOutOfBoundsException | NumberFormatException ignored) {
             } catch (IllegalStateException ex) {
                 sendData(ServerToClientEnum.BAD_STATE, ex.getMessage());

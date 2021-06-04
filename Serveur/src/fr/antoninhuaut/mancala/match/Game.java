@@ -6,14 +6,9 @@ import fr.antoninhuaut.mancala.socket.Session;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class Game {
 
-    private Player pOne;
-    private Player pTwo;
-
-    private final PlayerData[] playersData = new PlayerData[2];
     private final Session session;
 
     private Round currentRound;
@@ -24,9 +19,6 @@ public class Game {
         this.session = session;
         this.nbRound = 0;
 
-        for (var i = 0; i < playersData.length; i++) {
-            playersData[i] = new PlayerData(i);
-        }
         nextRound();
     }
 
@@ -44,7 +36,7 @@ public class Game {
 
     public void endGame() {
         this.isGameFinished = true;
-        PlayerData[] pData = getPlayersData();
+        PlayerData[] pData = session.getPlayersData();
 
         int winnerId;
         var roundOneWin = pData[0].getNbRoundWin();
@@ -58,29 +50,25 @@ public class Game {
             winnerId = -1;
         }
 
-        for (Player p : Arrays.asList(pOne, pTwo)) {
-            if (p != null) {
-                p.sendData(ServerToClientEnum.END_GAME, "" + winnerId);
-            }
+        for (Player p : session.getNoNullPlayers()) {
+            p.sendData(ServerToClientEnum.END_GAME, "" + winnerId);
         }
     }
 
-    public synchronized void addPlayer(Player p) throws IOException, ClassNotFoundException {
-        boolean isPlayerOne;
-        if (pOne == null) {
-            pOne = p;
-            isPlayerOne = true;
-        } else {
-            pTwo = p;
-            isPlayerOne = false;
+    public void forceStopMatch() {
+        for (Player pLoop : session.getNoNullPlayers()) {
+            pLoop.sendData(ServerToClientEnum.BAD_STATE, ServerToClientEnum.BadStateEnum.STOP_MATCH.name());
         }
+        endGame();
+    }
 
-        p.waitSetup(this, isPlayerOne);
+    public synchronized void addPlayer(Player p) {
+        p.gameSetup();
         sendGlobalUpdate();
     }
 
     private synchronized void resetPlayers() {
-        for (PlayerData pData : playersData) {
+        for (PlayerData pData : session.getPlayersData()) {
             pData.resetScore();
         }
     }
@@ -93,44 +81,24 @@ public class Game {
 
         var nbPlayer = session.getNbPlayer();
         if (nbPlayer == 1) {
-            (pOne != null ? pOne : pTwo).sendData(ServerToClientEnum.WAIT_OPPONENT);
+            for (Player pLoop : session.getNoNullPlayers()) {
+                pLoop.sendData(ServerToClientEnum.WAIT_OPPONENT);
+            }
         } else if (nbPlayer == 2) {
             currentRound.initPostPlayersJoined();
-            pOne.sendData(ServerToClientEnum.OPPONENT_NAME, playersData[1].getUsername());
-            pTwo.sendData(ServerToClientEnum.OPPONENT_NAME, playersData[0].getUsername());
+            session.getPOne().sendData(ServerToClientEnum.OPPONENT_NAME, session.getPlayersData()[1].getUsername());
+            session.getPTwo().sendData(ServerToClientEnum.OPPONENT_NAME, session.getPlayersData()[0].getUsername());
         }
     }
 
-    public synchronized void removePlayer(Player p) {
-        if (pOne != null && pOne.equals(p)) {
-            pOne = null;
-
-            if (pTwo != null) {
-                pTwo.sendData(ServerToClientEnum.WAIT_OPPONENT);
-            }
-        } else if (pTwo != null && pTwo.equals(p)) {
-            pTwo = null;
-
-            if (pOne != null) {
-                pOne.sendData(ServerToClientEnum.WAIT_OPPONENT);
-            }
+    public synchronized void removePlayer() {
+        for (Player pLoop : session.getNoNullPlayers()) {
+            pLoop.sendData(ServerToClientEnum.WAIT_OPPONENT);
         }
     }
 
     public boolean isGameFinished() {
         return isGameFinished;
-    }
-
-    public Player getPOne() {
-        return pOne;
-    }
-
-    public Player getPTwo() {
-        return pTwo;
-    }
-
-    public Player getOppositePlayer(Player playerAtm) {
-        return playerAtm.equals(getPOne()) ? getPTwo() : getPOne();
     }
 
     public Round getCurrentRound() {
@@ -139,13 +107,5 @@ public class Game {
 
     public Session getSession() {
         return session;
-    }
-
-    public PlayerData[] getPlayersData() {
-        return playersData;
-    }
-
-    public void setPlayerName(int playerId, String username) {
-        this.playersData[playerId].setUsername(username);
     }
 }

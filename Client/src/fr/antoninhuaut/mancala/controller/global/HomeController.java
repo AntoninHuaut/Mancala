@@ -32,6 +32,11 @@ public class HomeController extends FXController {
     }
 
     @FXML
+    public void newMatch() {
+        mancalaSocket.get().sendData(ClientToServerEnum.NEW_MATCH);
+    }
+
+    @FXML
     public void stopMatch() {
         mancalaSocket.get().sendData(ClientToServerEnum.STOP_MATCH);
     }
@@ -42,9 +47,5 @@ public class HomeController extends FXController {
 
     protected MancalaSocket getMancalaSocket() {
         return mancalaSocket.get();
-    }
-
-    private GameController getGameController() {
-        return mancalaSocket.get().getGameController();
     }
 }

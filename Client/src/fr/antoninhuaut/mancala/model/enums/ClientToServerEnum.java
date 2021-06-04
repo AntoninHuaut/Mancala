@@ -5,8 +5,9 @@ public enum ClientToServerEnum {
     CLIENT_INIT,
     MOVE,
 
-    UNDO,
+    NEW_MATCH,
     STOP_MATCH,
+    UNDO,
 
     UNKNOWN;
 

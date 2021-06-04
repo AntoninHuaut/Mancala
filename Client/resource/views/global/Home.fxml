@@ -37,6 +37,14 @@
                   <Font size="20.0" />
                </font>
             </Label>
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#newMatch" prefHeight="40.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.newmatch">
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+               <font>
+                  <Font name="Helvetica 65 Medium" size="17.0" />
+               </font>
+            </Button>
             <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#stopMatch" prefHeight="40.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.stopmatch">
                <padding>
                   <Insets left="20.0" />

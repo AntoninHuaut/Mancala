@@ -54,4 +54,9 @@ public class PlayerData {
     public void addWinRound() {
         nbRoundWin++;
     }
+
+    public void reset() {
+        resetScore();
+        nbRoundWin = 0;
+    }
 }
