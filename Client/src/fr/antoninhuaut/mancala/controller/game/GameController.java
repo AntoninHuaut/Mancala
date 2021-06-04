@@ -7,6 +7,7 @@ import fr.antoninhuaut.mancala.model.views.game.GameData;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -123,8 +124,11 @@ public class GameController extends FXController {
 
         playersNameLabel.visibleProperty().bind(gameData.playersNameLabelVisiblityProperty());
         playersNameLabel.textProperty().bind(gameData.playersNameLabelTextProperty());
+
         pOneScoreLabel.textProperty().bind(gameData.pOneScoreLabelTextProperty());
         pTwoScoreLabel.textProperty().bind(gameData.pTwoScoreLabelTextProperty());
+        pOneMatchLabel.textProperty().bind(Bindings.concat(gameData.pOneMatchLabelTextProperty(), "/6"));
+        pTwoMatchLabel.textProperty().bind(Bindings.concat(gameData.pTwoMatchLabelTextProperty(), "/6"));
 
         stackPlayerOne.visibleProperty().bind(gameData.stackPlayerOneVisibilityProperty());
         stackPlayerTwo.visibleProperty().bind(gameData.stackPlayerTwoVisibilityProperty());
@@ -227,6 +231,21 @@ public class GameController extends FXController {
             }
         };
         errorTimer.schedule(errorTimerTask, 2500);
+    }
+
+    public void setMatchLabel(int pOneMatchWin, int pTwoMatchWin) {
+        gameData.pOneMatchLabelTextProperty().set("" + pOneMatchWin);
+        gameData.pTwoMatchLabelTextProperty().set("" + pTwoMatchWin);
+    }
+
+    public void setWinner(int winnerId) {
+        if (myPlayerId == -1) {
+            setInfosLabel("game.end.round.tie", "#00B2EE");
+        } else if (myPlayerId == winnerId) {
+            setInfosLabel("game.end.round.win", "#4caf50");
+        } else {
+            setInfosLabel("game.end.round.lose", "#FF0000");
+        }
     }
 
     private void cancelTimerTask() {

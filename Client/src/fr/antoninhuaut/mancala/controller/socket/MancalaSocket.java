@@ -62,28 +62,34 @@ public class MancalaSocket {
 
     private void analyseRequest(ServerToClientEnum sEnum, String[] args) throws IOException {
         if (sEnum == ServerToClientEnum.WELCOME) {
-            final String playerNumber = args[1];
+            final var playerNumber = args[1];
             fx(() -> gameController.initWelcome(playerNumber));
         } //
         else if (sEnum == ServerToClientEnum.WAIT_OPPONENT) {
             fx(() -> gameController.waitOpponent());
         } //
         else if (sEnum == ServerToClientEnum.INIT_PLAYER) {
-            final boolean isYourTurn = args[1].equals("YOU");
+            final var isYourTurn = args[1].equals("YOU");
             fx(() -> gameController.initPostPlayerJoin(isYourTurn));
         } //
         else if (sEnum == ServerToClientEnum.OPPONENT_NAME) {
-            final String opponentName = args[1];
+            final var opponentName = args[1];
             fx(() -> gameController.setPlayersName(opponentName));
         } //
         else if (sEnum == ServerToClientEnum.BAD_STATE) {
-            final String errorKey = args[1].toLowerCase();
+            final var errorKey = args[1].toLowerCase();
             fx(() -> gameController.setErrorLabel(errorKey));
+        } //
+        else if (sEnum == ServerToClientEnum.END_ROUND) {
+            final var winnerId = Integer.parseInt(args[1]);
+            fx(() -> gameController.setWinner(winnerId));
         } //
         else if (sEnum == ServerToClientEnum.GAME_UPDATE) {
             var playerTurnId = input.readInt();
             var pOneScore = input.readInt();
+            var pOneRoundWin = input.readInt();
             var pTwoScore = input.readInt();
+            var pTwoRoundWin = input.readInt();
 
             var cells = new Cell[NB_LINE][NB_COL];
             for (var line = 0; line < NB_LINE; ++line) {
@@ -95,7 +101,10 @@ public class MancalaSocket {
                 }
             }
 
-            fx(() -> gameController.updateGameState(cells, playerTurnId, pOneScore, pTwoScore));
+            fx(() -> {
+                gameController.updateGameState(cells, playerTurnId, pOneScore, pTwoScore);
+                gameController.setMatchLabel(pOneRoundWin, pTwoRoundWin);
+            });
         } //
     }
 

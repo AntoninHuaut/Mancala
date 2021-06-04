@@ -1,7 +1,6 @@
 package fr.antoninhuaut.mancala.socket;
 
 import fr.antoninhuaut.mancala.match.Game;
-import fr.antoninhuaut.mancala.model.Player;
 
 import java.io.IOException;
 

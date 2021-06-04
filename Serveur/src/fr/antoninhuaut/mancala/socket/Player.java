@@ -1,7 +1,9 @@
-package fr.antoninhuaut.mancala.model;
+package fr.antoninhuaut.mancala.socket;
 
 import fr.antoninhuaut.mancala.match.Game;
 import fr.antoninhuaut.mancala.match.Round;
+import fr.antoninhuaut.mancala.model.Cell;
+import fr.antoninhuaut.mancala.model.PlayerData;
 import fr.antoninhuaut.mancala.socket.cenum.ClientToServerEnum;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 import org.apache.logging.log4j.LogManager;
@@ -12,17 +14,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Objects;
-import java.util.Random;
-import java.util.Scanner;
 
 public class Player {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    private String username = "Player" + (new Random().nextInt(899) + 100);
-
-    private int nbRoundWin;
-    private int currentScore;
 
     private final Socket socket;
     private ObjectInputStream input;
@@ -34,7 +29,6 @@ public class Player {
 
     public Player(Socket socket) {
         this.socket = socket;
-        this.nbRoundWin = 0;
     }
 
     public void waitSetup(Game game, boolean isPlayerOne) throws IOException, ClassNotFoundException {
@@ -51,7 +45,7 @@ public class Player {
 
             var clientCommand = ClientToServerEnum.extractFromCommand(arguments[0]);
             if (clientCommand == ClientToServerEnum.CLIENT_INIT) {
-                this.username = arguments[1];
+                this.game.setPlayerName(getPlayerId(), arguments[1]);
             }
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException ignored) {
         }
@@ -64,7 +58,7 @@ public class Player {
             processCommands();
         } catch (IOException | ClassNotFoundException ignored) {
         } finally {
-            LOGGER.debug("Player {} quit", username);
+            LOGGER.debug("Player{} quit", getPlayerId());
             game.getSession().removePlayer(this);
 
             try {
@@ -79,7 +73,7 @@ public class Player {
             try {
                 String inputData = (String) input.readObject();
                 String[] arguments = inputData.split(" ");
-                LOGGER.debug("Receive from {}: {}", username, inputData);
+                LOGGER.debug("Receive from Player{}: {}", getPlayerId(), inputData);
 
                 var clientCommand = ClientToServerEnum.extractFromCommand(arguments[0]);
                 if (clientCommand == ClientToServerEnum.MOVE) { // MOVE <line> <col>
@@ -87,7 +81,6 @@ public class Player {
                     processMoveCommand(Integer.parseInt(data[1]), Integer.parseInt(data[2]));
                 } //
             } catch (ArrayIndexOutOfBoundsException | NumberFormatException ignored) {
-                ignored.printStackTrace();
             }
         }
     }
@@ -108,12 +101,14 @@ public class Player {
         }
     }
 
-    public void sendGameUpdate(Cell[][] cells, int turnPlayerId, int pOneScore, int pTwoScore) {
+    public void sendGameUpdate(Cell[][] cells, int turnPlayerId, PlayerData[] playerData) {
         try {
             output.writeObject(ServerToClientEnum.GAME_UPDATE.name());
             output.writeInt(turnPlayerId);
-            output.writeInt(pOneScore);
-            output.writeInt(pTwoScore);
+            output.writeInt(playerData[0].getCurrentScore());
+            output.writeInt(playerData[0].getNbRoundWin());
+            output.writeInt(playerData[1].getCurrentScore());
+            output.writeInt(playerData[1].getNbRoundWin());
 
             for (var line = 0; line < Round.NB_LINE; ++line) {
                 for (var col = 0; col < Round.NB_COL; ++col) {
@@ -128,24 +123,8 @@ public class Player {
         }
     }
 
-    public boolean hasWin() {
-        return currentScore >= 25;
-    }
-
-    public void addScore(int addScore) {
-        this.currentScore += addScore;
-    }
-
-    public int getCurrentScore() {
-        return currentScore;
-    }
-
     public int getPlayerId() {
         return isPlayerOne ? 0 : 1;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     @Override

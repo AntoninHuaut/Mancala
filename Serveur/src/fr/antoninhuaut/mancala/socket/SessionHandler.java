@@ -1,6 +1,5 @@
 package fr.antoninhuaut.mancala.socket;
 
-import fr.antoninhuaut.mancala.model.Player;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

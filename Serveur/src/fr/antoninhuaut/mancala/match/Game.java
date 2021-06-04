@@ -1,6 +1,7 @@
 package fr.antoninhuaut.mancala.match;
 
-import fr.antoninhuaut.mancala.model.Player;
+import fr.antoninhuaut.mancala.model.PlayerData;
+import fr.antoninhuaut.mancala.socket.Player;
 import fr.antoninhuaut.mancala.socket.Session;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 
@@ -11,6 +12,8 @@ public class Game {
     private Player pOne;
     private Player pTwo;
 
+    private PlayerData[] playersData = new PlayerData[2];
+
     private final Session session;
 
     private Round currentRound;
@@ -19,12 +22,21 @@ public class Game {
     public Game(Session session) {
         this.session = session;
         this.nbRound = 0;
-        startGame();
+
+        for (var i = 0; i < playersData.length; i++) {
+            playersData[i] = new PlayerData(i);
+        }
+        nextRound();
     }
 
-    public void startGame() {
-        for (var i = 0; i < 6; i++) {
+    public void nextRound() {
+        if (nbRound == 6) {
+            // TODO
+        } else {
+            resetPlayers();
+            nbRound++;
             this.currentRound = new Round(this);
+            sendGlobalUpdate();
         }
     }
 
@@ -39,13 +51,24 @@ public class Game {
         }
 
         p.waitSetup(this, isPlayerOne);
+        sendGlobalUpdate();
+    }
 
-        if (session.getNbPlayer() == 1) {
-            p.sendData(ServerToClientEnum.WAIT_OPPONENT);
-        } else {
+    private synchronized void resetPlayers() {
+        for (PlayerData pData : playersData) {
+            pData.resetScore();
+        }
+    }
+
+    private synchronized void sendGlobalUpdate() {
+        var nbPlayer = session.getNbPlayer();
+
+        if (nbPlayer == 1) {
+            (pOne != null ? pOne : pTwo).sendData(ServerToClientEnum.WAIT_OPPONENT);
+        } else if (nbPlayer == 2) {
             currentRound.initPostPlayersJoined();
-            pOne.sendData(ServerToClientEnum.OPPONENT_NAME, pTwo.getUsername());
-            pTwo.sendData(ServerToClientEnum.OPPONENT_NAME, pOne.getUsername());
+            pOne.sendData(ServerToClientEnum.OPPONENT_NAME, playersData[1].getUsername());
+            pTwo.sendData(ServerToClientEnum.OPPONENT_NAME, playersData[0].getUsername());
         }
     }
 
@@ -83,5 +106,13 @@ public class Game {
 
     public Session getSession() {
         return session;
+    }
+
+    public PlayerData[] getPlayersData() {
+        return playersData;
+    }
+
+    public void setPlayerName(int playerId, String username) {
+        this.playersData[playerId].setUsername(username);
     }
 }

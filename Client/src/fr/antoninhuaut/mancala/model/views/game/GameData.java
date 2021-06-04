@@ -15,12 +15,22 @@ public class GameData {
     private final StringProperty playersNameLabelText = new SimpleStringProperty();
     private final StringProperty pOneScoreLabelText = new SimpleStringProperty();
     private final StringProperty pTwoScoreLabelText = new SimpleStringProperty();
+    private final StringProperty pOneMatchLabelText = new SimpleStringProperty();
+    private final StringProperty pTwoMatchLabelText = new SimpleStringProperty();
 
     private final DoubleProperty[] bols = new DoubleProperty[16];
     private final StringProperty[][] cells = new StringProperty[2][6];
 
     private final ObjectProperty<Color> infosLabelColor = new SimpleObjectProperty<>();
     private StringBinding infosLabelText, errorLabelText;
+
+    public StringProperty pOneMatchLabelTextProperty() {
+        return pOneMatchLabelText;
+    }
+
+    public StringProperty pTwoMatchLabelTextProperty() {
+        return pTwoMatchLabelText;
+    }
 
     public BooleanProperty errorLabelVisibilityProperty() {
         return errorLabelVisibility;

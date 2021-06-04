@@ -2,14 +2,13 @@ package fr.antoninhuaut.mancala.match;
 
 import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.Move;
-import fr.antoninhuaut.mancala.model.Player;
+import fr.antoninhuaut.mancala.model.MoveEnum;
+import fr.antoninhuaut.mancala.socket.Player;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 public class Round {
 
@@ -49,33 +48,41 @@ public class Round {
     public synchronized void play(Player player, int linePlayed, int colPlayed) {
         var currentPlayer = getCurrentPlayer();
         if (currentPlayer != player) {
-            throw new IllegalStateException("NOT_YOUR_TURN"); // TODO CLIENT
+            throw new IllegalStateException(ServerToClientEnum.BadStateEnum.NOT_YOUR_TURN.name());
         } else if (playerTurnId == null || linePlayed != player.getPlayerId()) {
-            throw new IllegalStateException("NOT_YOUR_CELL"); // TODO CLIENT
+            throw new IllegalStateException(ServerToClientEnum.BadStateEnum.NOT_YOUR_CELL.name());
         }
 
-        lastMove = new Move(this, cells, currentPlayer);
-        var moveEnum = lastMove.doMove(linePlayed, colPlayed);
-        LOGGER.debug("Move: {}", moveEnum);
+        this.lastMove = new Move(this, cells, game.getPlayersData()[currentPlayer.getPlayerId()]);
+        var moveEnum = this.lastMove.doMove(linePlayed, colPlayed);
+        LOGGER.debug("Move: {} - isSuccess: {}", moveEnum, moveEnum.isSuccess());
         if (!moveEnum.isSuccess()) {
-            // TODO CLIENT
-            return;
+            throw new IllegalStateException(moveEnum.name());
         }
 
         var nextPlayerTurn = game.getOppositePlayer(currentPlayer);
         sendGameUpdate(nextPlayerTurn);
 
-        Optional<Player> optWinner = getWinner();
+        Optional<Player> optWinner = getWinner(moveEnum);
         if (optWinner.isPresent()) {
             Player winner = optWinner.get();
 
             for (Player p : Arrays.asList(winner, game.getOppositePlayer(winner))) {
-                p.sendData(ServerToClientEnum.END_ROUND, "" + winner.getPlayerId()); // TODO CLIENT
+                p.sendData(ServerToClientEnum.END_ROUND, "" + winner.getPlayerId());
             }
-            // TODO gestion 6 rounds/fin du jeu
-        }
 
-        this.playerTurnId = nextPlayerTurn.getPlayerId();
+            game.getPlayersData()[winner.getPlayerId()].addWinRound();
+            this.playerTurnId = -1; // Empêche toute futur action
+
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    game.nextRound();
+                }
+            }, 5000);
+        } else {
+            this.playerTurnId = nextPlayerTurn.getPlayerId();
+        }
     }
 
     public void undo() {
@@ -89,13 +96,21 @@ public class Round {
 
     private void sendGameUpdate(Player nextPlayerTurn) {
         for (Player pLoop : Arrays.asList(nextPlayerTurn, game.getOppositePlayer(nextPlayerTurn))) {
-            pLoop.sendGameUpdate(cells, nextPlayerTurn.getPlayerId(), game.getPOne().getCurrentScore(), game.getPTwo().getCurrentScore());
+            pLoop.sendGameUpdate(cells, nextPlayerTurn.getPlayerId(), game.getPlayersData());
         }
     }
 
-    private Optional<Player> getWinner() {
-        if (game.getPOne().hasWin()) return Optional.of(game.getPOne());
-        else if (game.getPTwo().hasWin()) return Optional.of(game.getPTwo());
+    private Optional<Player> getWinner(MoveEnum moveEnum) {
+        var playerData = game.getPlayersData();
+
+        // Gagnant si l'opposant ne peut plus jouer
+        if (moveEnum == MoveEnum.SUCCESS_AND_WIN_OPPONENT_CANT_PLAY) {
+            return Optional.of(getCurrentPlayer());
+        }
+
+        // Gagnant par points
+        if (playerData[0].hasWin()) return Optional.of(game.getPOne());
+        else if (playerData[1].hasWin()) return Optional.of(game.getPTwo());
         return Optional.empty();
     }
 
@@ -106,9 +121,5 @@ public class Round {
     private Player getPlayerById(int id) {
         if (id == 0) return game.getPOne();
         else return game.getPTwo();
-    }
-
-    public Game getGame() {
-        return game;
     }
 }

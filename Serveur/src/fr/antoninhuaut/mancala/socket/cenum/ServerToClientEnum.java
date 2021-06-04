@@ -19,4 +19,8 @@ public enum ServerToClientEnum {
         return UNKNOWN;
     }
 
+    public enum BadStateEnum {
+        NOT_YOUR_TURN,
+        NOT_YOUR_CELL;
+    }
 }

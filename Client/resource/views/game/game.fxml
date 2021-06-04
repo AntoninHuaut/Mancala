@@ -309,7 +309,7 @@
                      <children>
                         <VBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <VBox alignment="CENTER" prefHeight="200.0" spacing="15.0">
+                              <VBox alignment="CENTER" prefHeight="200.0" spacing="5.0">
                                  <children>
                                     <Label fx:id="pOneScoreLabel" text="0">
                                        <font>
@@ -323,7 +323,7 @@
                                     </Label>
                                  </children>
                               </VBox>
-                              <VBox alignment="CENTER" prefHeight="200.0" spacing="15.0">
+                              <VBox alignment="CENTER" prefHeight="200.0" spacing="5.0">
                                  <children>
                                     <Label fx:id="pTwoScoreLabel" text="0">
                                        <font>

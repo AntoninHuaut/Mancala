@@ -11,8 +11,4 @@ public enum MoveEnum {
     public boolean isSuccess() {
         return this == SUCCESS || this == SUCCESS_FORBIDDEN_CAPTURE || this == SUCCESS_AND_WIN_OPPONENT_CANT_PLAY;
     }
-
-    public boolean isWin() {
-        return this == SUCCESS_AND_WIN_OPPONENT_CANT_PLAY;
-    }
 }

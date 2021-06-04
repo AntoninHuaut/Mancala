@@ -1,6 +1,7 @@
 package fr.antoninhuaut.mancala.model;
 
 import fr.antoninhuaut.mancala.match.Round;
+import fr.antoninhuaut.mancala.socket.Player;
 
 public class Cell {
 
@@ -26,11 +27,11 @@ public class Cell {
         this.nbSeed++;
     }
 
-    public static int getSeedInCellForPlayer(Cell[][] cells, Player player) {
+    public static int getSeedInCellForPlayer(Cell[][] cells, int playerId) {
         var nbSeedCells = 0;
 
         for (var col = 0; col < Round.NB_COL; col++) {
-            nbSeedCells += cells[player.getPlayerId()][col].getNbSeed();
+            nbSeedCells += cells[playerId][col].getNbSeed();
         }
 
         return nbSeedCells;
