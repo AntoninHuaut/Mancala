@@ -55,6 +55,8 @@ public class AppFX extends Application {
                 FadeUtils.fade(this.stage, true);
             }
         });
+
+        this.stage.setOnCloseRequest(req -> System.exit(0));
     }
 
     public Stage getStage() {
