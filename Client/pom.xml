@@ -5,17 +5,32 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fr.antoninhuaut</groupId>
-    <artifactId>mancalaclient</artifactId>
+    <artifactId>Mancala</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
+        <maven.compiler>11</maven.compiler>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <java.version>11</java.version>
+        <java.version.min>11</java.version.min>
+        <sonar.java.source>11</sonar.java.source>
+        <sonar.java.taget>11</sonar.java.taget>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <main.class>fr.antoninhuaut.mancala.AppFX</main.class>
+        <main.class>fr.antoninhuaut.mancala.MainLauncher</main.class>
+
+        <!-- JavaPackager global configuration (Windows + Linux) -->
+        <administratorRequired>false</administratorRequired>
+        <bundleJre>true</bundleJre>
+        <customizedJre>true</customizedJre>
+        <mainClass>${main.class}</mainClass>
+        <runnableJar>
+            ${project.build.directory}/${project.name}_${project.version}-lite.jar
+        </runnableJar>
+        <classpath>libs/*</classpath>
     </properties>
 
     <dependencies>
@@ -39,12 +54,6 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>11.0.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.github.palexdev</groupId>
-            <artifactId>materialfx</artifactId>
-            <version>11.10.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
@@ -91,10 +100,87 @@
                 <version>0.0.6</version>
                 <configuration>
                     <mainClass>${main.class}</mainClass>
-                    <!--                    <options>-->
-                    <!--                        <option>${jvm.arg}</option>-->
-                    <!--                    </options>-->
                 </configuration>
+            </plugin>
+
+            <!-- Copy all dependencies to prepare them in the installer version -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Jar file without dependencies -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <classifier>lite</classifier>
+                    <finalName>${project.name}_${project.version}</finalName>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>libs/</classpathPrefix>
+                            <mainClass>${main.class}</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                    <excludes>
+                        <exclude>**/*.jar</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>io.github.fvarrui</groupId>
+                <artifactId>javapackager</artifactId>
+                <version>1.5.1</version>
+                <configuration>
+                    <name>${project.name}</name>
+                    <organizationName>ENSICaen</organizationName>
+                    <administratorRequired>${administratorRequired}</administratorRequired>
+                    <bundleJre>${bundleJre}</bundleJre>
+                    <customizedJre>${customizedJre}</customizedJre>
+                    <mainClass>${main.class}</mainClass>
+                    <runnableJar>${runnableJar}</runnableJar>
+                    <classpath>${classpath}</classpath>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>bundling-windows</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                        <configuration>
+                            <platform>windows</platform>
+                            <generateInstaller>true</generateInstaller>
+                            <winConfig>
+                                <icoFile>assets/windows/Mancala.ico</icoFile>
+                                <generateMsi>false</generateMsi>
+                                <setupMode>installForCurrentUser</setupMode>
+                                <setupLanguages>
+                                    <english>compiler:Default.isl</english>
+                                    <french>compiler:Languages\French.isl</french>
+                                </setupLanguages>
+                            </winConfig>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

@@ -5,18 +5,18 @@ import fr.antoninhuaut.mancala.model.enums.UserPrefType;
 import fr.antoninhuaut.mancala.model.views.socket.SocketConnectionData;
 import fr.antoninhuaut.mancala.model.views.socket.SocketConnectionModel;
 import fr.antoninhuaut.mancala.utils.PreferenceUtils;
-import fr.antoninhuaut.mancala.utils.form.validator.IntegerTextField;
 import fr.antoninhuaut.mancala.utils.form.misc.StringNumberConverter;
+import fr.antoninhuaut.mancala.utils.form.validator.IntegerTextField;
 import fr.antoninhuaut.mancala.utils.form.validator.NoSpaceTextField;
 import fr.antoninhuaut.mancala.view.game.GameView;
 import fr.antoninhuaut.mancala.view.global.HomeView;
-import io.github.palexdev.materialfx.controls.MFXButton;
-import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
-import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextField;
 
 import java.io.IOException;
 import java.util.Random;
@@ -24,13 +24,13 @@ import java.util.Random;
 public class SocketConnectionController extends FXController {
 
     @FXML
-    private MFXProgressSpinner loadingSpinner;
+    private ProgressIndicator loadingSpinner;
 
     @FXML
-    private MFXButton connectBtn;
+    private Button connectBtn;
 
     @FXML
-    private MFXTextField usernameField, hostField, portField;
+    private TextField usernameField, hostField, portField;
 
     @FXML
     private Label errorMsg;

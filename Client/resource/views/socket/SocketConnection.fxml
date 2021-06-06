@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import io.github.palexdev.materialfx.controls.MFXButton?>
-<?import io.github.palexdev.materialfx.controls.MFXProgressSpinner?>
-<?import io.github.palexdev.materialfx.controls.MFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="700.0" stylesheets="@../GlobalButton.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="600.0" prefWidth="700.0" stylesheets="@../GlobalButton.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <GridPane layoutX="230.0" layoutY="155.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <columnConstraints>
@@ -62,11 +62,11 @@
                                           </Label>
                                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                                              <children>
-                                                <MFXTextField fx:id="usernameField" lineColor="#0d6efd" lineStrokeWidth="1.5" minHeight="40.0" minWidth="200.0" promptText="%socket.username.form.prompt">
+                                                <TextField fx:id="usernameField" minHeight="40.0" minWidth="200.0" promptText="%socket.username.form.prompt">
                                                    <font>
                                                       <Font size="16.0" />
                                                    </font>
-                                                </MFXTextField>
+                                                </TextField>
                                              </children>
                                           </HBox>
                                        </children>
@@ -80,32 +80,32 @@
                                           </Label>
                                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0" spacing="10.0">
                                              <children>
-                                                <MFXTextField fx:id="hostField" lineColor="#0d6efd" lineStrokeWidth="1.5" minHeight="40.0" minWidth="200.0" promptText="%socket.socketconnection.form.host.prompt">
+                                                <TextField fx:id="hostField" minHeight="40.0" minWidth="200.0" promptText="%socket.socketconnection.form.host.prompt">
                                                    <font>
                                                       <Font size="16.0" />
                                                    </font>
-                                                </MFXTextField>
+                                                </TextField>
                                                 <Label minWidth="5.0" text=":">
                                                    <font>
                                                       <Font size="20.0" />
                                                    </font>
                                                 </Label>
-                                                <MFXTextField fx:id="portField" lineColor="#0d6efd" lineStrokeWidth="1.5" minHeight="40.0" minWidth="50.0" prefWidth="60.0" promptText="%socket.socketconnection.form.port.prompt">
+                                                <TextField fx:id="portField" minHeight="40.0" minWidth="50.0" prefWidth="60.0" promptText="%socket.socketconnection.form.port.prompt">
                                                    <font>
                                                       <Font size="16.0" />
                                                    </font>
-                                                </MFXTextField>
+                                                </TextField>
                                              </children>
                                           </HBox>
                                        </children>
                                     </VBox>
                                  </children>
                               </HBox>
-                              <MFXButton fx:id="connectBtn" buttonType="RAISED" onAction="#tryConnection" styleClass="success" text="%socket.socketconnection.form.connect" textFill="WHITE">
+                              <Button fx:id="connectBtn" onAction="#tryConnection" styleClass="success" text="%socket.socketconnection.form.connect" textFill="WHITE">
                                  <font>
                                     <Font size="18.0" />
                                  </font>
-                              </MFXButton>
+                              </Button>
                            </children>
                         </VBox>
                      </children>
@@ -114,14 +114,14 @@
             </VBox>
                 <HBox alignment="CENTER" minHeight="200.0" minWidth="200.0" spacing="50.0" GridPane.rowIndex="2">
                <children>
-                  <VBox alignment="CENTER" minWidth="700.0" spacing="5.0">
+                  <VBox alignment="CENTER" minWidth="700.0" spacing="15.0">
                      <children>
                         <Label fx:id="errorMsg" text="%socket.socketconnection.failed" textFill="RED">
                            <font>
                               <Font size="22.0" />
                            </font>
                         </Label>
-                        <MFXProgressSpinner fx:id="loadingSpinner" prefHeight="150.0" prefWidth="700.0" />
+                        <ProgressIndicator fx:id="loadingSpinner" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="125.0" />
                      </children>
                   </VBox>
                </children>

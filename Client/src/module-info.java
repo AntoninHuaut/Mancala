@@ -3,7 +3,6 @@ module fr.antoninhuaut.projet {
 
     requires javafx.controls;
     requires javafx.fxml;
-    requires MaterialFX.materialfx.main;
     requires org.apache.logging.log4j;
 
     opens fr.antoninhuaut.mancala.controller.socket;
