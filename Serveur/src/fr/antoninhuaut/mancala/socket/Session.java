@@ -89,14 +89,14 @@ public class Session {
     private void reLaunchGame(Game game, ServerToClientEnum.MessageEnum request) {
         this.game = game.init(this);
 
-        getNoNullPlayers().forEach(game::addPlayer);
-        getNoNullPlayers().forEach(p -> p.sendData(ServerToClientEnum.MESSAGE, request.name()));
-
         if (request == ServerToClientEnum.MessageEnum.NEW_MATCH) {
             this.game.nextRound();
         } else if (request == ServerToClientEnum.MessageEnum.MATCH_LOAD_FROM_SAVE) {
             this.game.reloadRound();
         }
+
+        getNoNullPlayers().forEach(game::addPlayer);
+        getNoNullPlayers().forEach(p -> p.sendData(ServerToClientEnum.MESSAGE, request.name()));
     }
 
     public void saveGame(Player p) {
