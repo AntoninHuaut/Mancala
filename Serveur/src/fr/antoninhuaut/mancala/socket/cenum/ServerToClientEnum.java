@@ -7,9 +7,16 @@ public enum ServerToClientEnum {
     WAIT_OPPONENT,
     GAME_UPDATE,
     OPPONENT_NAME,
-    BAD_STATE,
+    MESSAGE,
+
     END_ROUND,
     END_GAME,
+
+    SAVE_SUCCESS,
+    SAVE_FAILED,
+    LOAD_SAVE_SUCCESS,
+    LOAD_SAVE_FAILED,
+
     UNKNOWN;
 
     public static ServerToClientEnum extractFromCommand(String data) {
@@ -20,11 +27,12 @@ public enum ServerToClientEnum {
         return UNKNOWN;
     }
 
-    public enum BadStateEnum {
+    public enum MessageEnum {
         NOT_YOUR_TURN,
         CANT_UNDO_NOW,
         NOT_YOUR_CELL,
         NEW_MATCH,
+        MATCH_LOAD_FROM_SAVE,
         STOP_MATCH;
     }
 }

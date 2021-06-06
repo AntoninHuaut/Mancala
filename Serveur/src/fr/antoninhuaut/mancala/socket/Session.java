@@ -2,43 +2,52 @@ package fr.antoninhuaut.mancala.socket;
 
 import fr.antoninhuaut.mancala.match.Game;
 import fr.antoninhuaut.mancala.model.PlayerData;
+import fr.antoninhuaut.mancala.save.SaveException;
+import fr.antoninhuaut.mancala.save.SaveLoadException;
+import fr.antoninhuaut.mancala.save.SaveManager;
+import fr.antoninhuaut.mancala.save.SaveState;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Session {
 
-    private static int counter = 0;
-    private final int sessionId;
+    private static final Random random = new Random();
+    private static final int sessionIdLength = 4;
+
+    private final String sessionId;
 
     private final PlayerData[] playersData = new PlayerData[2];
 
+    private Game game;
+
     private Player pOne;
     private Player pTwo;
-
-    private int nbPlayer = 0;
-
-    private Game game;
 
     public Session() {
         for (var i = 0; i < playersData.length; i++) {
             playersData[i] = new PlayerData(i);
         }
 
-        this.game = new Game(this);
-        this.sessionId = Session.counter++;
+        this.sessionId = generateSessionId();
+        this.game = new Game().init(this);
+        this.game.nextRound();
     }
 
     public int getNbPlayer() {
+        var nbPlayer = 0;
+        if (pOne != null) nbPlayer++;
+        if (pTwo != null) nbPlayer++;
         return nbPlayer;
     }
 
     public void addPlayer(Player p) throws IOException, ClassNotFoundException {
-        this.nbPlayer++;
         boolean isPlayerOne;
 
         if (pOne == null) {
@@ -54,7 +63,6 @@ public class Session {
     }
 
     public void removePlayer(Player p) {
-        this.nbPlayer--;
         if (pOne != null && pOne.equals(p)) {
             pOne = null;
         } else if (pTwo != null && pTwo.equals(p)) {
@@ -63,9 +71,69 @@ public class Session {
 
         game.removePlayer();
 
-        if (nbPlayer == 0) {
+        if (getNbPlayer() == 0) {
             SessionHandler.destroySession(this);
         }
+    }
+
+    public void stopAndStartNewGame() {
+        stopGame();
+        reLaunchGame(new Game(), ServerToClientEnum.MessageEnum.NEW_MATCH);
+    }
+
+    private void stopGame() {
+        game.endGame();
+        Arrays.stream(playersData).forEach(PlayerData::reset);
+    }
+
+    private void reLaunchGame(Game game, ServerToClientEnum.MessageEnum request) {
+        this.game = game.init(this);
+
+        getNoNullPlayers().forEach(game::addPlayer);
+        getNoNullPlayers().forEach(p -> p.sendData(ServerToClientEnum.MESSAGE, request.name()));
+
+        if (request == ServerToClientEnum.MessageEnum.NEW_MATCH) {
+            this.game.nextRound();
+        } else if (request == ServerToClientEnum.MessageEnum.MATCH_LOAD_FROM_SAVE) {
+            this.game.reloadRound();
+        }
+    }
+
+    public void saveGame(Player p) {
+        var saveState = new SaveState().setPlayerData(playersData).setGame(getGame());
+        try {
+            SaveManager.getInstance().saveGame(getSessionId(), saveState);
+            p.sendData(ServerToClientEnum.SAVE_SUCCESS, getSessionId());
+        } catch (SaveException ignore) {
+            p.sendData(ServerToClientEnum.SAVE_FAILED);
+        }
+    }
+
+    public void loadGame(Player p, String saveName) {
+        try {
+            stopGame();
+            var saveState = SaveManager.getInstance().loadSave(saveName);
+
+            for (var i = 0; i < saveState.getPlayerData().length; i++) {
+                var currentPlayerData = getPlayersData()[i];
+                var loadPlayerData = saveState.getPlayerData()[i];
+                currentPlayerData.restoreSaved(loadPlayerData);
+            }
+
+            reLaunchGame(saveState.getGame(), ServerToClientEnum.MessageEnum.MATCH_LOAD_FROM_SAVE);
+            p.sendData(ServerToClientEnum.LOAD_SAVE_SUCCESS);
+        } catch (SaveLoadException ignore) {
+            p.sendData(ServerToClientEnum.LOAD_SAVE_FAILED);
+        }
+    }
+
+    // Alphanumeric session id
+    private String generateSessionId() {
+        return random.ints(48, 123)
+                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                .limit(sessionIdLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString().toUpperCase();
     }
 
     public PlayerData[] getPlayersData() {
@@ -96,23 +164,7 @@ public class Session {
         return Stream.of(pOne, pTwo).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public int getSessionId() {
+    public String getSessionId() {
         return sessionId;
-    }
-
-    public void newGame() {
-        game.endGame();
-        for (PlayerData playerData: playersData) {
-            playerData.reset();
-        }
-        this.game = new Game(this);
-
-        for (Player p : getNoNullPlayers()) {
-            game.addPlayer(p);
-        }
-
-        for (Player p : getNoNullPlayers()) {
-            p.sendData(ServerToClientEnum.BAD_STATE, ServerToClientEnum.BadStateEnum.NEW_MATCH.name());
-        }
     }
 }

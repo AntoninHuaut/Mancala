@@ -7,22 +7,30 @@ import java.util.List;
 
 public class Move {
 
-    private final Round round;
-    private final Cell[][] roundCells;
-    private final Cell[][] initialCells;
+    private transient Round round;
+    private Cell[][] roundCells;
+    private Cell[][] initialCells;
     private Cell[][] finalCells;
 
-    private final PlayerData currentPData;
+    private int currentPlayerId;
     private int playerAddScore = 0;
 
     private boolean isDo = false;
 
-    public Move(Round round, Cell[][] cells, PlayerData currentPData) {
-        this.round = round;
+    public Move() {
+        // For save loading
+    }
+
+    public Move(Cell[][] cells, PlayerData currentPData) {
         this.roundCells = cells;
-        this.currentPData = currentPData;
+        this.currentPlayerId = currentPData.getPlayerId();
         this.initialCells = deepCopy(cells);
         this.finalCells = deepCopy(cells);
+    }
+
+    public void init(Cell[][] cells, Round round) {
+        this.round = round;
+        this.roundCells = cells;
     }
 
     private synchronized void playMove(int linePlayed, int colPlayed, boolean allowSeedCapture) {
@@ -66,7 +74,7 @@ public class Move {
             --nbSeed;
         }
 
-        return new int[] { line, col };
+        return new int[]{line, col};
     }
 
     private synchronized void captureSeed(Integer line, Integer col) {
@@ -121,9 +129,9 @@ public class Move {
         opponentSeedsInCells = getOpponentSeedInCells();
         /* REGLE 6 (Part 2) */
         if (opponentSeedsInCells == 0 && getMoveToFeedOpponent().isEmpty()) {
-            int currentPlayerSeedsInCells = Cell.getSeedInCellForPlayer(finalCells, currentPData.getPlayerId());
+            int currentPlayerSeedsInCells = Cell.getSeedInCellForPlayer(finalCells, currentPlayerId);
             for (var col = 0; col < Round.NB_COL; col++) {
-                finalCells[currentPData.getPlayerId()][col].clearSeed();
+                finalCells[currentPlayerId][col].clearSeed();
             }
             playerAddScore += currentPlayerSeedsInCells;
             moveResult = MoveEnum.SUCCESS_AND_WIN_OPPONENT_CANT_PLAY;
@@ -133,7 +141,8 @@ public class Move {
         for (var line = 0; line < Round.NB_LINE; ++line) {
             System.arraycopy(finalCells[line], 0, roundCells[line], 0, Round.NB_COL);
         }
-        currentPData.addScore(playerAddScore);
+
+        getCurrentPData().addScore(playerAddScore);
 
         this.isDo = true;
         return moveResult;
@@ -146,13 +155,13 @@ public class Move {
             System.arraycopy(initialCells[line], 0, roundCells[line], 0, Round.NB_COL);
         }
 
-        currentPData.removeScore(playerAddScore);
+        getCurrentPData().removeScore(playerAddScore);
 
         this.isDo = false;
     }
 
     private int getOpponentSeedInCells() {
-        return Cell.getSeedInCellForPlayer(finalCells, (currentPData.getPlayerId() + 1) % 2);
+        return Cell.getSeedInCellForPlayer(finalCells, (currentPlayerId + 1) % 2);
     }
 
     private List<Integer> getMoveToFeedOpponent() {
@@ -160,7 +169,7 @@ public class Move {
         List<Integer> possibleMove = new ArrayList<>();
 
         for (var col = 0; col < Round.NB_COL; col++) {
-            playMove(currentPData.getPlayerId(), col, true);
+            playMove(getCurrentPData().getPlayerId(), col, true);
             if (getOpponentSeedInCells() > 0) {
                 possibleMove.add(col);
             }
@@ -168,6 +177,10 @@ public class Move {
         }
 
         return possibleMove;
+    }
+
+    private PlayerData getCurrentPData() {
+        return round.getGame().getSession().getPlayersData()[currentPlayerId];
     }
 
     private Cell[][] deepCopy(Cell[][] cells) {

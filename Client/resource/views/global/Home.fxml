@@ -30,14 +30,14 @@
             <Insets />
          </opaqueInsets>
       </VBox>
-      <VBox fx:id="mancalaMenu" prefHeight="200.0" prefWidth="100.0">
+      <VBox fx:id="mancalaMenu" prefHeight="250.0" prefWidth="100.0">
          <children>
             <Label text=" Mancala :" textFill="WHITE">
                <font>
                   <Font size="20.0" />
                </font>
             </Label>
-            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#newMatch" prefHeight="40.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.newmatch">
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#saveMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.savematch">
                <padding>
                   <Insets left="20.0" />
                </padding>
@@ -45,7 +45,7 @@
                   <Font name="Helvetica 65 Medium" size="17.0" />
                </font>
             </Button>
-            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#stopMatch" prefHeight="40.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.stopmatch">
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#loadMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.loadmatch">
                <padding>
                   <Insets left="20.0" />
                </padding>
@@ -53,7 +53,31 @@
                   <Font name="Helvetica 65 Medium" size="17.0" />
                </font>
             </Button>
-            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#undo" prefHeight="40.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.undo">
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#surrender" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.surrender">
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+               <font>
+                  <Font name="Helvetica 65 Medium" size="17.0" />
+               </font>
+            </Button>
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#newMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.newmatch">
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+               <font>
+                  <Font name="Helvetica 65 Medium" size="17.0" />
+               </font>
+            </Button>
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#stopMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.stopmatch">
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+               <font>
+                  <Font name="Helvetica 65 Medium" size="17.0" />
+               </font>
+            </Button>
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#undo" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.undo">
                <padding>
                   <Insets left="20.0" />
                </padding>

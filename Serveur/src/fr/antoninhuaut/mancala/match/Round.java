@@ -8,7 +8,10 @@ import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Round {
 
@@ -17,20 +20,33 @@ public class Round {
     public static final int NB_LINE = 2;
     public static final int NB_COL = 6;
 
-    private final Game game;
-    private final Cell[][] cells;
+    private transient Game game;
+    private Cell[][] cells;
 
     private Integer playerTurnId = null;
     private Move lastMove;
 
-    public Round(Game game) {
-        this.game = game;
+    public Round() {
+        // For save loading
+    }
+
+    public Round create() {
         this.cells = new Cell[NB_LINE][NB_COL];
         for (var line = 0; line < NB_LINE; ++line) {
             for (var col = 0; col < NB_COL; ++col) {
                 cells[line][col] = new Cell(4);
             }
         }
+        return this;
+    }
+
+    public Round init(Game game) {
+        this.game = game;
+
+        if (lastMove != null) {
+            lastMove.init(cells, this);
+        }
+        return this;
     }
 
     public void initPostPlayersJoined() {
@@ -56,14 +72,15 @@ public class Round {
         var currentPlayer = getCurrentPlayer();
 
         if (playerTurnId != player.getPlayerId() || currentPlayer == null) {
-            throw new IllegalStateException(ServerToClientEnum.BadStateEnum.NOT_YOUR_TURN.name());
+            throw new IllegalStateException(ServerToClientEnum.MessageEnum.NOT_YOUR_TURN.name());
         } else if (playerTurnId == null || linePlayed != player.getPlayerId()) {
-            throw new IllegalStateException(ServerToClientEnum.BadStateEnum.NOT_YOUR_CELL.name());
+            throw new IllegalStateException(ServerToClientEnum.MessageEnum.NOT_YOUR_CELL.name());
         }
 
         var pData = game.getSession().getPlayersData()[currentPlayer.getPlayerId()];
 
-        this.lastMove = new Move(this, cells, pData);
+        this.lastMove = new Move(cells, pData);
+        this.lastMove.init(cells, this);
 
         var moveEnum = this.lastMove.doMove(linePlayed, colPlayed);
         LOGGER.debug("Move: {} - isSuccess: {}", moveEnum, moveEnum.isSuccess());
@@ -100,7 +117,7 @@ public class Round {
         if (game.isGameFinished()) return;
 
         if (lastMove == null || playerTurnId == -1 || playerId == playerTurnId) {
-            throw new IllegalStateException(ServerToClientEnum.BadStateEnum.CANT_UNDO_NOW.name());
+            throw new IllegalStateException(ServerToClientEnum.MessageEnum.CANT_UNDO_NOW.name());
         }
 
         lastMove.undoMove();
@@ -143,5 +160,9 @@ public class Round {
         if (id == 0) return game.getSession().getPOne();
         else if (id == 1) return game.getSession().getPTwo();
         else return null;
+    }
+
+    public Game getGame() {
+        return game;
     }
 }

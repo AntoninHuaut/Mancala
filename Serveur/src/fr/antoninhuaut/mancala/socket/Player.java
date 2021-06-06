@@ -51,7 +51,7 @@ public class Player {
     }
 
     public void gameSetup() {
-        sendData(ServerToClientEnum.WELCOME, "PLAYER_" + (isPlayerOne ? "ONE" : "TWO"));
+        sendData(ServerToClientEnum.WELCOME, "PLAYER_" + (isPlayerOne ? "ONE" : "TWO"), session.getSessionId());
     }
 
     public void listenClient() {
@@ -79,11 +79,18 @@ public class Player {
                 var clientCommand = ClientToServerEnum.extractFromCommand(arguments[0]);
                 switch (clientCommand) {
                     case MOVE:
-                        var data = inputData.split(" ");
-                        session.getGame().getCurrentRound().play(this, Integer.parseInt(data[1]), Integer.parseInt(data[2]));
+                        var moveData = inputData.split(" ");
+                        session.getGame().getCurrentRound().play(this, Integer.parseInt(moveData[1]), Integer.parseInt(moveData[2]));
                         break;
                     case NEW_MATCH:
-                        session.newGame();
+                        session.stopAndStartNewGame();
+                        break;
+                    case SAVE_MATCH:
+                        session.saveGame(this);
+                        break;
+                    case LOAD_MATCH:
+                        var loadData = inputData.split(" ");
+                        session.loadGame(this, loadData[1]);
                         break;
                     case STOP_MATCH:
                         session.getGame().forceStopMatch();
@@ -96,7 +103,7 @@ public class Player {
                 }
             } catch (ArrayIndexOutOfBoundsException | NumberFormatException ignored) {
             } catch (IllegalStateException ex) {
-                sendData(ServerToClientEnum.BAD_STATE, ex.getMessage());
+                sendData(ServerToClientEnum.MESSAGE, ex.getMessage());
             }
         }
     }

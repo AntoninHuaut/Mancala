@@ -5,9 +5,11 @@ import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.enums.ServerToClientEnum;
 import fr.antoninhuaut.mancala.model.enums.ClientToServerEnum;
 import fr.antoninhuaut.mancala.model.views.socket.SocketConnectionData;
+import fr.antoninhuaut.mancala.utils.components.alert.GenericAlert;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,6 +32,7 @@ public class MancalaSocket {
     private final HomeView homeView;
     private GameController gameController;
     private final String username;
+    private String sessionId;
 
     public MancalaSocket(SocketConnectionData socketConnectionData, HomeView homeView) throws IOException {
         this.socket = new Socket(socketConnectionData.getHost(), socketConnectionData.getPort());
@@ -60,10 +63,10 @@ public class MancalaSocket {
     }
 
     private void analyseRequest(ServerToClientEnum sEnum, String[] args) throws IOException {
-        switch(sEnum) {
+        switch (sEnum) {
             case WELCOME:
-                final var playerNumber = args[1];
-                fx(() -> gameController.initWelcome(playerNumber));
+                this.sessionId = args[2];
+                fx(() -> gameController.initWelcome(args[1]));
                 break;
             case INIT_PLAYER:
                 final var isYourTurn = args[1].equals("YOU");
@@ -76,7 +79,7 @@ public class MancalaSocket {
                 final var opponentName = args[1];
                 fx(() -> gameController.setPlayersName(opponentName));
                 break;
-            case BAD_STATE:
+            case MESSAGE:
                 final var errorKey = args[1].toLowerCase();
                 fx(() -> gameController.setErrorLabel(errorKey));
                 break;
@@ -87,6 +90,18 @@ public class MancalaSocket {
             case END_GAME:
                 final var winnerMatchId = Integer.parseInt(args[1]);
                 fx(() -> gameController.setWinnerMatch(winnerMatchId));
+                break;
+            case SAVE_SUCCESS:
+                fx(() -> new GenericAlert(Alert.AlertType.INFORMATION, "game.savemanager.save_success", args[1]).showAndWait());
+                break;
+            case SAVE_FAILED:
+                fx(() -> new GenericAlert(Alert.AlertType.ERROR, "game.savemanager.save_failed").showAndWait());
+                break;
+            case LOAD_SAVE_SUCCESS:
+                fx(() -> new GenericAlert(Alert.AlertType.INFORMATION, "game.savemanager.load_save_success").showAndWait());
+                break;
+            case LOAD_SAVE_FAILED:
+                fx(() -> new GenericAlert(Alert.AlertType.ERROR, "game.savemanager.load_save_failed").showAndWait());
                 break;
             case GAME_UPDATE:
                 var playerTurnId = input.readInt();
@@ -148,5 +163,9 @@ public class MancalaSocket {
 
     public GameController getGameController() {
         return gameController;
+    }
+
+    public String getSessionId() {
+        return sessionId;
     }
 }

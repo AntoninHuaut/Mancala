@@ -6,7 +6,7 @@ public class PlayerData {
 
     private final int playerId;
 
-    private String username = "Player" + (new Random().nextInt(899) + 100);
+    private transient String username = "Player" + (new Random().nextInt(899) + 100);
 
     private int nbRoundWin = 0;
     private int currentScore = 0;
@@ -17,6 +17,11 @@ public class PlayerData {
 
     public int getPlayerId() {
         return playerId;
+    }
+
+    public void restoreSaved(PlayerData loaded) {
+        this.nbRoundWin = loaded.getNbRoundWin();
+        this.currentScore = loaded.getCurrentScore();
     }
 
     public boolean hasWinRound() {

@@ -5,31 +5,43 @@ import fr.antoninhuaut.mancala.socket.Player;
 import fr.antoninhuaut.mancala.socket.Session;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 
-import java.io.IOException;
+import java.util.Arrays;
 
 public class Game {
 
-    private final Session session;
+    private transient Session session;
 
     private Round currentRound;
-    private int nbRound;
     private boolean isGameFinished = false;
 
-    public Game(Session session) {
-        this.session = session;
-        this.nbRound = 0;
+    public Game() {
+        // For save loading
+    }
 
-        nextRound();
+    public Game init(Session session) {
+        this.session = session;
+
+        if (currentRound != null) {
+            currentRound.init(this);
+        }
+        return this;
     }
 
     public void nextRound() {
         resetPlayers();
 
-        if (nbRound >= 6) {
+        if (getNbRound() >= 6) {
             endGame();
         } else {
-            nbRound++;
-            this.currentRound = new Round(this);
+            this.currentRound = new Round().create().init(this);
+            sendGlobalUpdate();
+        }
+    }
+
+    public void reloadRound() {
+        if (getNbRound() >= 6) {
+            endGame();
+        } else {
             sendGlobalUpdate();
         }
     }
@@ -57,7 +69,7 @@ public class Game {
 
     public void forceStopMatch() {
         for (Player pLoop : session.getNoNullPlayers()) {
-            pLoop.sendData(ServerToClientEnum.BAD_STATE, ServerToClientEnum.BadStateEnum.STOP_MATCH.name());
+            pLoop.sendData(ServerToClientEnum.MESSAGE, ServerToClientEnum.MessageEnum.STOP_MATCH.name());
         }
         endGame();
     }
@@ -89,6 +101,10 @@ public class Game {
             session.getPOne().sendData(ServerToClientEnum.OPPONENT_NAME, session.getPlayersData()[1].getUsername());
             session.getPTwo().sendData(ServerToClientEnum.OPPONENT_NAME, session.getPlayersData()[0].getUsername());
         }
+    }
+
+    public int getNbRound() {
+        return Arrays.stream(session.getPlayersData()).mapToInt(PlayerData::getNbRoundWin).reduce(Integer::sum).getAsInt();
     }
 
     public synchronized void removePlayer() {
