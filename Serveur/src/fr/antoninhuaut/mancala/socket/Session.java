@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class Session {
 
     private static final Random random = new Random();
-    private static final int sessionIdLength = 4;
+    private static final int sessionIdLength = 5;
 
     private final String sessionId;
 
