@@ -3,14 +3,18 @@ package fr.antoninhuaut.mancala.controller.game;
 import fr.antoninhuaut.mancala.controller.global.FXController;
 import fr.antoninhuaut.mancala.controller.socket.MancalaSocket;
 import fr.antoninhuaut.mancala.model.Cell;
+import fr.antoninhuaut.mancala.model.enums.ClientToServerEnum;
 import fr.antoninhuaut.mancala.model.views.game.GameData;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -54,10 +58,13 @@ public class GameController extends FXController {
     public HBox pOneBox, pTwoBox;
 
     @FXML
+    public Button surrenderBtn;
+
+    @FXML
     public ImageView bol00, bol01, bol02, bol03, bol04, bol05, bol10, bol11, bol12, bol13, bol14, bol15;
 
     private int myPlayerId;
-    private boolean isYourTurn = false;
+    private final BooleanProperty isYourTurn = new SimpleBooleanProperty(false);
 
     private GameData gameData;
     private final Timer errorTimer = new Timer();
@@ -142,6 +149,8 @@ public class GameController extends FXController {
         stackPlayerOne.visibleProperty().bind(gameData.stackPlayerOneVisibilityProperty());
         stackPlayerTwo.visibleProperty().bind(gameData.stackPlayerTwoVisibilityProperty());
 
+        surrenderBtn.disableProperty().bind(gameData.surrenderBtnDisableProperty());
+
         setTurnLabel();
     }
 
@@ -164,20 +173,29 @@ public class GameController extends FXController {
         mancalaSocket.sendMove(line, col);
     }
 
+    @FXML
+    public void suggestSurender() {
+        mancalaSocket.sendData(ClientToServerEnum.ASK_FOR_SURRENDER_VOTE);
+    }
+
     public void updateGameState(Cell[][] cells, int playerTurnId, int pOneScore, int pTwoScore) {
         LOGGER.debug("Updating game state [playerTurnId: {}, pOneScore: {}, pTwoScore: {}]", playerTurnId, pOneScore, pTwoScore);
+
+        var nbCellsRemaining = 0;
 
         for (var line = 0; line < cells.length; ++line) {
             for (var col = 0; col < cells[line].length; ++col) {
                 var cell = cells[line][col];
                 gameData.getCells()[line][col].set("" + cell.getNbSeed());
+                nbCellsRemaining += cell.getNbSeed();
             }
         }
 
+        gameData.surrenderBtnDisableProperty().set(nbCellsRemaining > 10);
         gameData.pOneScoreLabelTextProperty().set("" + pOneScore);
         gameData.pTwoScoreLabelTextProperty().set("" + pTwoScore);
 
-        this.isYourTurn = playerTurnId == myPlayerId;
+        this.isYourTurn.set(playerTurnId == myPlayerId);
         setTurnLabel();
         cancelTimerTask();
     }
@@ -194,19 +212,24 @@ public class GameController extends FXController {
     }
 
     public void initPostPlayerJoin(boolean isYourTurn) {
-        this.isYourTurn = isYourTurn;
+        this.isYourTurn.set(isYourTurn);
         setTurnLabel();
         gameData.gameGridVisibilityProperty().set(true);
     }
 
+    private void resetHBox() {
+        pOneBox.getStyleClass().clear();
+        pTwoBox.getStyleClass().clear();
+    }
+
     public void setTurnLabel() {
+        resetHBox();
         HBox myBox = myPlayerId == 0 ? pOneBox : pTwoBox;
-        if (isYourTurn) {
+        if (isYourTurn.get()) {
             setInfosLabel("game.info.turn_you", GREEN_COLOR);
             myBox.getStyleClass().add(HBOXTURN_CLASS);
         } else {
             setInfosLabel("game.info.turn_opponent", BLUE_COLOR);
-            myBox.getStyleClass().remove(HBOXTURN_CLASS);
         }
     }
 
@@ -253,7 +276,8 @@ public class GameController extends FXController {
     }
 
     public void setWinnerRound(int winnerId) {
-        if (myPlayerId == -1) {
+        resetHBox();
+        if (winnerId == -1) {
             setInfosLabel("game.end.round.tie", BLUE_COLOR);
         } else if (myPlayerId == winnerId) {
             setInfosLabel("game.end.round.win", GREEN_COLOR);
@@ -263,6 +287,7 @@ public class GameController extends FXController {
     }
 
     public void setWinnerMatch(int winnerId) {
+        resetHBox();
         gameData.gameGridVisibilityProperty().set(false);
         if (winnerId == -1) {
             setInfosLabel("game.end.match.tie", BLUE_COLOR);

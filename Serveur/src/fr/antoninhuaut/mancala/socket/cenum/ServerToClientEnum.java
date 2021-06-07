@@ -17,6 +17,8 @@ public enum ServerToClientEnum {
     LOAD_SAVE_SUCCESS,
     LOAD_SAVE_FAILED,
 
+    ASK_TO_SURRENDER,
+
     UNKNOWN;
 
     public static ServerToClientEnum extractFromCommand(String data) {
@@ -33,6 +35,8 @@ public enum ServerToClientEnum {
         NOT_YOUR_CELL,
         NEW_MATCH,
         MATCH_LOAD_FROM_SAVE,
+        SUCCESS_SURRENDER,
+        FAIL_SURRENDER,
         STOP_MATCH;
     }
 }

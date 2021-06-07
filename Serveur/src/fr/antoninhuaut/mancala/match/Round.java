@@ -8,12 +8,13 @@ import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Round {
+public class Round implements Serializable {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -22,6 +23,8 @@ public class Round {
 
     private transient Game game;
     private Cell[][] cells;
+
+    private boolean[] surrenderVote;
 
     private Integer playerTurnId = null;
     private Move lastMove;
@@ -32,6 +35,7 @@ public class Round {
 
     public Round create() {
         this.cells = new Cell[NB_LINE][NB_COL];
+        this.surrenderVote = new boolean[2];
         for (var line = 0; line < NB_LINE; ++line) {
             for (var col = 0; col < NB_COL; ++col) {
                 cells[line][col] = new Cell(4);
@@ -93,24 +97,28 @@ public class Round {
 
         Optional<Integer> optWinner = getWinnerId(moveEnum);
         if (optWinner.isPresent()) {
-            Integer winnerId = optWinner.get();
-
-            for (Player p : game.getSession().getNoNullPlayers()) {
-                p.sendData(ServerToClientEnum.END_ROUND, "" + winnerId);
-            }
-
-            game.getSession().getPlayersData()[winnerId].addWinRound();
-            this.playerTurnId = -1; // Empêche toute futur action sur ce round (qui est terminé)
-
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    game.nextRound();
-                }
-            }, 5000);
+            processVictory(optWinner.get());
         } else {
             this.playerTurnId = nextPlayerTurn.getPlayerId();
         }
+    }
+
+    private void processVictory(Integer winnerId) {
+        for (var p : game.getSession().getNoNullPlayers()) {
+            p.sendData(ServerToClientEnum.END_ROUND, "" + winnerId);
+        }
+
+        if (winnerId != null && winnerId != -1) {
+            game.getSession().getPlayersData()[winnerId].addWinRound();
+        }
+        this.playerTurnId = -1; // Empêche toute futur action sur ce round (qui est terminé)
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                game.nextRound();
+            }
+        }, 5000);
     }
 
     public void undo(int playerId) {
@@ -134,6 +142,67 @@ public class Round {
 
         for (Player pLoop : game.getSession().getNoNullPlayers()) {
             pLoop.sendGameUpdate(cells, nextPlayerTurn.getPlayerId(), game.getSession().getPlayersData());
+        }
+    }
+
+    private void resetSurrenderVote() {
+        for (var i = 0; i < 2; i++) {
+            surrenderVote[i] = false;
+        }
+    }
+
+    private int getCellRemaining() {
+        return Cell.getSeedInCellForPlayer(cells, 0) + Cell.getSeedInCellForPlayer(cells, 1);
+    }
+
+    private boolean isPossibleToSurrender() {
+        return getCellRemaining() <= 10;
+    }
+
+    public void acceptSurrender(Player pAcceptSurrender) {
+        if (!isPossibleToSurrender()) return;
+
+        int pSurrenderId = pAcceptSurrender.getPlayerId();
+        surrenderVote[pSurrenderId] = true;
+
+        if (surrenderVote[0] && surrenderVote[1]) {
+            for (Player pLoop : game.getSession().getNoNullPlayers()) {
+                pLoop.sendData(ServerToClientEnum.MESSAGE, ServerToClientEnum.MessageEnum.SUCCESS_SURRENDER.name());
+            }
+
+            int nbSeedRemaining = getCellRemaining();
+
+            game.getSession().getPlayersData()[pSurrenderId].addScore(nbSeedRemaining / 2);
+            game.getSession().getPlayersData()[(pSurrenderId + 1) % 2].addScore(nbSeedRemaining / 2);
+
+            processVictory(getWinnerId(null).orElse(-1));
+        }
+
+        resetSurrenderVote();
+    }
+
+    public void denySurrender() {
+        if (!isPossibleToSurrender()) return;
+        resetSurrenderVote();
+
+        for (Player pLoop : game.getSession().getNoNullPlayers()) {
+            pLoop.sendData(ServerToClientEnum.MESSAGE, ServerToClientEnum.MessageEnum.FAIL_SURRENDER.name());
+        }
+    }
+
+    public void handleAskSurrenderVote(Player pAskSurrender) {
+        if (!isPossibleToSurrender()) return;
+        if (playerTurnId != pAskSurrender.getPlayerId()) {
+            throw new IllegalStateException(ServerToClientEnum.MessageEnum.NOT_YOUR_TURN.name());
+        }
+
+        resetSurrenderVote();
+        surrenderVote[pAskSurrender.getPlayerId()] = true;
+
+        for (Player pLoop : game.getSession().getNoNullPlayers()) {
+            if (!pLoop.equals(pAskSurrender)) {
+                pLoop.sendData(ServerToClientEnum.ASK_TO_SURRENDER);
+            }
         }
     }
 

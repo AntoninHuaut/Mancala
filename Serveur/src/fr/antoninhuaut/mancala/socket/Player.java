@@ -95,6 +95,15 @@ public class Player {
                     case STOP_MATCH:
                         session.getGame().forceStopMatch();
                         break;
+                    case ASK_FOR_SURRENDER_VOTE:
+                        session.getGame().getCurrentRound().handleAskSurrenderVote(this);
+                        break;
+                    case ACCEPT_SURRENDER:
+                        session.getGame().getCurrentRound().acceptSurrender(this);
+                        break;
+                    case REFUSE_SURRENDER:
+                        session.getGame().getCurrentRound().denySurrender();
+                        break;
                     case UNDO:
                         session.getGame().getCurrentRound().undo(getPlayerId());
                         break;

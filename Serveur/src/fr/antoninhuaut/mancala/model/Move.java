@@ -2,10 +2,11 @@ package fr.antoninhuaut.mancala.model;
 
 import fr.antoninhuaut.mancala.match.Round;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Move {
+public class Move implements Serializable {
 
     private transient Round round;
     private Cell[][] roundCells;

@@ -5,12 +5,13 @@ import fr.antoninhuaut.mancala.socket.Player;
 import fr.antoninhuaut.mancala.socket.Session;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 
-import java.util.Arrays;
+import java.io.Serializable;
 
-public class Game {
+public class Game implements Serializable {
 
     private transient Session session;
 
+    private int nbRound = 0;
     private Round currentRound;
     private boolean isGameFinished = false;
 
@@ -30,16 +31,17 @@ public class Game {
     public void nextRound() {
         resetPlayers();
 
-        if (getNbRound() >= 6) {
+        if (nbRound >= 6) {
             endGame();
         } else {
+            nbRound++;
             this.currentRound = new Round().create().init(this);
             sendGlobalUpdate();
         }
     }
 
     public void reloadRound() {
-        if (getNbRound() >= 6) {
+        if (nbRound >= 6) {
             endGame();
         } else {
             sendGlobalUpdate();
@@ -101,10 +103,6 @@ public class Game {
             session.getPOne().sendData(ServerToClientEnum.OPPONENT_NAME, session.getPlayersData()[1].getUsername());
             session.getPTwo().sendData(ServerToClientEnum.OPPONENT_NAME, session.getPlayersData()[0].getUsername());
         }
-    }
-
-    public int getNbRound() {
-        return Arrays.stream(session.getPlayersData()).mapToInt(PlayerData::getNbRoundWin).reduce(Integer::sum).getAsInt();
     }
 
     public synchronized void removePlayer() {

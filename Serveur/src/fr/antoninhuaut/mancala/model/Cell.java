@@ -1,9 +1,10 @@
 package fr.antoninhuaut.mancala.model;
 
 import fr.antoninhuaut.mancala.match.Round;
-import fr.antoninhuaut.mancala.socket.Player;
 
-public class Cell {
+import java.io.Serializable;
+
+public class Cell implements Serializable {
 
     private int nbSeed;
 

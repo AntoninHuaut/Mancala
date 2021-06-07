@@ -11,6 +11,7 @@ public class GameData {
     private final BooleanProperty gameGridVisibility = new SimpleBooleanProperty(false);
     private final BooleanProperty playersNameLabelVisiblity = new SimpleBooleanProperty(false);
     private final BooleanProperty errorLabelVisibility = new SimpleBooleanProperty(false);
+    private final BooleanProperty surrenderBtnDisable = new SimpleBooleanProperty(true);
 
     private final StringProperty playersNameLabelText = new SimpleStringProperty();
     private final StringProperty pOneScoreLabelText = new SimpleStringProperty();
@@ -23,6 +24,10 @@ public class GameData {
 
     private final ObjectProperty<Color> infosLabelColor = new SimpleObjectProperty<>();
     private StringBinding infosLabelText, errorLabelText;
+
+    public BooleanProperty surrenderBtnDisableProperty() {
+        return surrenderBtnDisable;
+    }
 
     public StringProperty pOneMatchLabelTextProperty() {
         return pOneMatchLabelText;

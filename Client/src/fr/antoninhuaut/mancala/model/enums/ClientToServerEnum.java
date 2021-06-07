@@ -9,6 +9,11 @@ public enum ClientToServerEnum {
     LOAD_MATCH,
     NEW_MATCH,
     STOP_MATCH,
+
+    ASK_FOR_SURRENDER_VOTE,
+    ACCEPT_SURRENDER,
+    REFUSE_SURRENDER,
+
     UNDO,
 
     UNKNOWN;

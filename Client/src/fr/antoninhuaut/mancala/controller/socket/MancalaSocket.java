@@ -2,9 +2,10 @@ package fr.antoninhuaut.mancala.controller.socket;
 
 import fr.antoninhuaut.mancala.controller.game.GameController;
 import fr.antoninhuaut.mancala.model.Cell;
-import fr.antoninhuaut.mancala.model.enums.ServerToClientEnum;
 import fr.antoninhuaut.mancala.model.enums.ClientToServerEnum;
+import fr.antoninhuaut.mancala.model.enums.ServerToClientEnum;
 import fr.antoninhuaut.mancala.model.views.socket.SocketConnectionData;
+import fr.antoninhuaut.mancala.utils.components.alert.ConfirmAlert;
 import fr.antoninhuaut.mancala.utils.components.alert.GenericAlert;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
@@ -102,6 +103,11 @@ public class MancalaSocket {
                 break;
             case LOAD_SAVE_FAILED:
                 fx(() -> new GenericAlert(Alert.AlertType.ERROR, "game.savemanager.load_save_failed").showAndWait());
+                break;
+            case ASK_TO_SURRENDER:
+                fx(() -> new ConfirmAlert("game.surrender.ask",
+                        () -> sendData(ClientToServerEnum.ACCEPT_SURRENDER),
+                        () -> sendData(ClientToServerEnum.REFUSE_SURRENDER)).showAndWait());
                 break;
             case GAME_UPDATE:
                 var playerTurnId = input.readInt();
