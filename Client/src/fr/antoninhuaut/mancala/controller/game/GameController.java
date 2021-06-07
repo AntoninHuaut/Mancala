@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
@@ -29,6 +30,7 @@ public class GameController extends FXController {
     private static final String GREEN_COLOR = "#4caf50";
     private static final String RED_COLOR = "#FF0000";
     private static final String BLUE_COLOR = "#00B2EE";
+    private static final String HBOXTURN_CLASS = "hboxTurn";
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final HomeView homeView;
@@ -47,6 +49,9 @@ public class GameController extends FXController {
     public StackPane stackPlayerOne, stackPlayerTwo;
     @FXML
     public ImageView arrowPlayerOne, arrowPlayerTwo;
+
+    @FXML
+    public HBox pOneBox, pTwoBox;
 
     @FXML
     public ImageView bol00, bol01, bol02, bol03, bol04, bol05, bol10, bol11, bol12, bol13, bol14, bol15;
@@ -136,6 +141,8 @@ public class GameController extends FXController {
 
         stackPlayerOne.visibleProperty().bind(gameData.stackPlayerOneVisibilityProperty());
         stackPlayerTwo.visibleProperty().bind(gameData.stackPlayerTwoVisibilityProperty());
+
+        setTurnLabel();
     }
 
     @FXML
@@ -193,10 +200,13 @@ public class GameController extends FXController {
     }
 
     public void setTurnLabel() {
+        HBox myBox = myPlayerId == 0 ? pOneBox : pTwoBox;
         if (isYourTurn) {
             setInfosLabel("game.info.turn_you", GREEN_COLOR);
+            myBox.getStyleClass().add(HBOXTURN_CLASS);
         } else {
             setInfosLabel("game.info.turn_opponent", BLUE_COLOR);
+            myBox.getStyleClass().remove(HBOXTURN_CLASS);
         }
     }
 
