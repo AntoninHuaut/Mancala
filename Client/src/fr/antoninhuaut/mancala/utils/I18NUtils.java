@@ -76,6 +76,14 @@ public final class I18NUtils {
 
     public enum SupportLanguage {
         EN,
-        FR
+        FR;
+
+        public static SupportLanguage getLang(String lang) {
+            try {
+                return SupportLanguage.valueOf(lang.toUpperCase());
+            } catch(IllegalArgumentException ignore) {
+                return SupportLanguage.EN;
+            }
+        }
     }
 }

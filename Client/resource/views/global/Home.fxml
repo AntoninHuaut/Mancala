@@ -32,10 +32,13 @@
       </VBox>
       <VBox fx:id="mancalaMenu" prefHeight="250.0" prefWidth="100.0">
          <children>
-            <Label text=" Mancala :" textFill="WHITE">
+            <Label text="Mancala" textFill="WHITE">
                <font>
                   <Font size="20.0" />
                </font>
+               <padding>
+                  <Insets left="5.0" />
+               </padding>
             </Label>
             <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#saveMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.savematch">
                <padding>
@@ -86,6 +89,32 @@
                </font>
             </Button>
          </children>
+      </VBox>
+      <VBox prefHeight="250.0" prefWidth="100.0">
+         <children>
+            <Label text="%home.rule.title" textFill="WHITE">
+               <font>
+                  <Font size="20.0" />
+               </font>
+               <padding>
+                  <Insets left="5.0" />
+               </padding>
+            </Label>
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#seeRule" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.rule.seerule">
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+               <font>
+                  <Font name="Helvetica 65 Medium" size="17.0" />
+               </font>
+            </Button>
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <padding>
+            <Insets top="5.0" />
+         </padding>
       </VBox>
     </children>
 </VBox>

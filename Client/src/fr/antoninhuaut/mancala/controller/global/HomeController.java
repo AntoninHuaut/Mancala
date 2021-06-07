@@ -1,9 +1,9 @@
 package fr.antoninhuaut.mancala.controller.global;
 
-import fr.antoninhuaut.mancala.controller.game.GameController;
 import fr.antoninhuaut.mancala.controller.socket.MancalaSocket;
 import fr.antoninhuaut.mancala.model.enums.ClientToServerEnum;
 import fr.antoninhuaut.mancala.utils.components.dialog.CodeDialog;
+import fr.antoninhuaut.mancala.utils.components.dialog.RuleDialog;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -25,6 +25,7 @@ public class HomeController extends FXController {
     @Override
     public void postLoad() {
         mancalaMenu.visibleProperty().bind(mancalaSocket.isNotNull());
+        mancalaMenu.managedProperty().bind(mancalaMenu.visibleProperty());
     }
 
     @FXML
@@ -35,7 +36,7 @@ public class HomeController extends FXController {
     @FXML
     public void loadMatch() {
         new CodeDialog("game.savemanager.load_save", mancalaSocket.get().getSessionId(),
-                (code) -> mancalaSocket.get().sendData(ClientToServerEnum.LOAD_MATCH, code));
+                code -> mancalaSocket.get().sendData(ClientToServerEnum.LOAD_MATCH, code));
     }
 
     @FXML
@@ -56,6 +57,11 @@ public class HomeController extends FXController {
     @FXML
     public void undo() {
         mancalaSocket.get().sendData(ClientToServerEnum.UNDO);
+    }
+
+    @FXML
+    public void seeRule() {
+        new RuleDialog("home.rule").showAndWait();
     }
 
     public void setMancalaSocket(MancalaSocket mancalaSocket) {
