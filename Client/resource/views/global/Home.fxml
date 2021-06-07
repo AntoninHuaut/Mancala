@@ -30,14 +30,14 @@
             <Insets />
          </opaqueInsets>
       </VBox>
-      <VBox fx:id="mancalaMenu" prefHeight="250.0" prefWidth="100.0">
+      <VBox fx:id="mancalaMenu">
          <children>
-            <Label text="Mancala" textFill="WHITE">
+            <Label text="Mancala :" textFill="WHITE">
                <font>
                   <Font size="20.0" />
                </font>
                <padding>
-                  <Insets left="5.0" />
+                  <Insets left="7.5" />
                </padding>
             </Label>
             <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#saveMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.savematch">
@@ -89,18 +89,29 @@
                </font>
             </Button>
          </children>
+         <padding>
+            <Insets top="25.0" />
+         </padding>
       </VBox>
       <VBox prefHeight="250.0" prefWidth="100.0">
          <children>
-            <Label text="%home.rule.title" textFill="WHITE">
+            <Label text="%home.util.label" textFill="WHITE">
                <font>
                   <Font size="20.0" />
                </font>
                <padding>
-                  <Insets left="5.0" />
+                  <Insets left="7.5" />
                </padding>
             </Label>
-            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#seeRule" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.rule.seerule">
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#seeRule" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.util.seerule">
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+               <font>
+                  <Font name="Helvetica 65 Medium" size="17.0" />
+               </font>
+            </Button>
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#settings" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.util.settings">
                <padding>
                   <Insets left="20.0" />
                </padding>
@@ -113,7 +124,7 @@
             <Insets />
          </VBox.margin>
          <padding>
-            <Insets top="5.0" />
+            <Insets top="25.0" />
          </padding>
       </VBox>
     </children>

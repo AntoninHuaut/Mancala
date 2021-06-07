@@ -64,6 +64,11 @@ public class HomeController extends FXController {
         new RuleDialog("home.rule").showAndWait();
     }
 
+    @FXML
+    public void settings() {
+
+    }
+
     public void setMancalaSocket(MancalaSocket mancalaSocket) {
         this.mancalaSocket.set(mancalaSocket);
     }
