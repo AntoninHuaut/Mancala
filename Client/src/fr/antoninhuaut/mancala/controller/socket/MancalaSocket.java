@@ -7,6 +7,7 @@ import fr.antoninhuaut.mancala.model.enums.ServerToClientEnum;
 import fr.antoninhuaut.mancala.model.views.socket.SocketConnectionData;
 import fr.antoninhuaut.mancala.utils.components.alert.ConfirmAlert;
 import fr.antoninhuaut.mancala.utils.components.alert.GenericAlert;
+import fr.antoninhuaut.mancala.utils.components.alert.HighscoreAlert;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
 import javafx.application.Platform;
@@ -58,6 +59,7 @@ public class MancalaSocket {
             } while (true);
         } catch (Exception ignored) {
         } finally {
+            homeView.getController().setMancalaSocket(null);
             socket.close();
             new SocketConnectionView(homeView).load();
         }
@@ -108,6 +110,13 @@ public class MancalaSocket {
                 fx(() -> new ConfirmAlert("game.surrender.ask",
                         () -> sendData(ClientToServerEnum.ACCEPT_SURRENDER),
                         () -> sendData(ClientToServerEnum.REFUSE_SURRENDER)).showAndWait());
+                break;
+            case RESPONSE_HIGHSCORE:
+                var resHighscore = new StringBuilder();
+                for (var i = 1; i < args.length; i++) {
+                    resHighscore.append(i == 1 ? "" : " ").append(args[i]);
+                }
+                fx(() -> new HighscoreAlert(resHighscore.toString()).showAndWait());
                 break;
             case GAME_UPDATE:
                 var playerTurnId = input.readInt();

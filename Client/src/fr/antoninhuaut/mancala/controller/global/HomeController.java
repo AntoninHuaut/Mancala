@@ -8,6 +8,7 @@ import fr.antoninhuaut.mancala.view.global.HomeView;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
 public class HomeController extends FXController {
@@ -18,6 +19,9 @@ public class HomeController extends FXController {
     @FXML
     public VBox mancalaMenu;
 
+    @FXML
+    public Button highscoreBtn;
+
     public void setView(HomeView homeView) {
         this.homeView = homeView;
     }
@@ -26,6 +30,7 @@ public class HomeController extends FXController {
     public void postLoad() {
         mancalaMenu.visibleProperty().bind(mancalaSocket.isNotNull());
         mancalaMenu.managedProperty().bind(mancalaMenu.visibleProperty());
+        highscoreBtn.disableProperty().bind(mancalaSocket.isNull());
     }
 
     @FXML
@@ -62,6 +67,11 @@ public class HomeController extends FXController {
     @FXML
     public void seeRule() {
         new RuleDialog("home.rule").showAndWait();
+    }
+
+    @FXML
+    public void highscore() {
+        mancalaSocket.get().sendData(ClientToServerEnum.ASK_HIGHSCORE);
     }
 
     @FXML

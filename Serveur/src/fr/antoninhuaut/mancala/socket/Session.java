@@ -2,8 +2,8 @@ package fr.antoninhuaut.mancala.socket;
 
 import fr.antoninhuaut.mancala.match.Game;
 import fr.antoninhuaut.mancala.model.PlayerData;
-import fr.antoninhuaut.mancala.save.SaveException;
-import fr.antoninhuaut.mancala.save.SaveLoadException;
+import fr.antoninhuaut.mancala.save.exception.SaveException;
+import fr.antoninhuaut.mancala.save.exception.SaveLoadException;
 import fr.antoninhuaut.mancala.save.SaveManager;
 import fr.antoninhuaut.mancala.save.SaveState;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;

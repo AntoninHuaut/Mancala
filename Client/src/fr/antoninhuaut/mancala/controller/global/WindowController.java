@@ -94,10 +94,7 @@ public class WindowController extends FXController {
         if (mancalaSocket == null) {
             new SocketConnectionView(this.homeView).load();
         } else {
-            new ConfirmAlert("window.home.ingame", () -> {
-                mancalaSocket.disconnect(); // Will load to SocketConnectionView
-                homeView.getController().setMancalaSocket(null);
-            }).showAndWait();
+            new ConfirmAlert("window.home.ingame", mancalaSocket::disconnect).showAndWait(); // Will load to SocketConnectionView
         }
     }
 

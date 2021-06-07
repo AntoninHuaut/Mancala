@@ -3,6 +3,8 @@ package fr.antoninhuaut.mancala.save;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import fr.antoninhuaut.mancala.save.exception.SaveException;
+import fr.antoninhuaut.mancala.save.exception.SaveLoadException;
 
 import java.io.File;
 import java.io.IOException;

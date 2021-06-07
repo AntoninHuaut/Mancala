@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="container" prefHeight="600.0" prefWidth="300.0" style="-fx-background-color: #9D7E68;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="container" prefHeight="600.0" prefWidth="300.0" style="-fx-background-color: #9D7E68;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <VBox alignment="TOP_CENTER" prefHeight="175.0" prefWidth="300.0" spacing="15.0">
          <children>
@@ -90,10 +90,10 @@
             </Button>
          </children>
          <padding>
-            <Insets top="25.0" />
+            <Insets top="15.0" />
          </padding>
       </VBox>
-      <VBox prefHeight="250.0" prefWidth="100.0">
+      <VBox>
          <children>
             <Label text="%home.util.label" textFill="WHITE">
                <font>
@@ -104,6 +104,14 @@
                </padding>
             </Label>
             <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#seeRule" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.util.seerule">
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+               <font>
+                  <Font name="Helvetica 65 Medium" size="17.0" />
+               </font>
+            </Button>
+            <Button fx:id="highscoreBtn" alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#highscore" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.util.highscore">
                <padding>
                   <Insets left="20.0" />
                </padding>
@@ -124,7 +132,7 @@
             <Insets />
          </VBox.margin>
          <padding>
-            <Insets top="25.0" />
+            <Insets top="15.0" />
          </padding>
       </VBox>
     </children>

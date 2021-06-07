@@ -3,6 +3,7 @@ package fr.antoninhuaut.mancala.socket;
 import fr.antoninhuaut.mancala.match.Round;
 import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.PlayerData;
+import fr.antoninhuaut.mancala.save.HighscoreManager;
 import fr.antoninhuaut.mancala.socket.cenum.ClientToServerEnum;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 import org.apache.logging.log4j.LogManager;
@@ -109,6 +110,9 @@ public class Player {
                         break;
                     case UNDO:
                         session.getGame().getCurrentRound().undo(getPlayerId());
+                        break;
+                    case ASK_HIGHSCORE:
+                        sendData(ServerToClientEnum.RESPONSE_HIGHSCORE, HighscoreManager.getInstance().getHighscoreSerialize());
                         break;
                     default:
                         break;

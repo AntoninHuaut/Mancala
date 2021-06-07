@@ -3,6 +3,8 @@ package fr.antoninhuaut.mancala.match;
 import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.Move;
 import fr.antoninhuaut.mancala.model.MoveEnum;
+import fr.antoninhuaut.mancala.model.PlayerData;
+import fr.antoninhuaut.mancala.save.HighscoreManager;
 import fr.antoninhuaut.mancala.socket.Player;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 import org.apache.logging.log4j.LogManager;
@@ -106,7 +108,9 @@ public class Round implements Serializable {
         }
 
         if (winnerId != null && winnerId != -1) {
-            game.getSession().getPlayersData()[winnerId].addWinRound();
+            var playerData = game.getSession().getPlayersData()[winnerId];
+            playerData.addWinRound();
+            HighscoreManager.getInstance().addHighscore(playerData.getUsername(), playerData.getCurrentScore());
         }
         this.playerTurnId = -1; // Empêche toute futur action sur ce round (qui est terminé)
 

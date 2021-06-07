@@ -18,6 +18,7 @@ public enum ServerToClientEnum {
     LOAD_SAVE_FAILED,
 
     ASK_TO_SURRENDER,
+    RESPONSE_HIGHSCORE,
 
     UNKNOWN;
 
