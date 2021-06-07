@@ -104,6 +104,9 @@ public class Player {
                     case REFUSE_SURRENDER:
                         session.getGame().getCurrentRound().denySurrender();
                         break;
+                    case SOLO_SURRENDER:
+                        session.getGame().getCurrentRound().soloSurrender(this);
+                        break;
                     case UNDO:
                         session.getGame().getCurrentRound().undo(getPlayerId());
                         break;

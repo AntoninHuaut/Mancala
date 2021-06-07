@@ -9,10 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class Round implements Serializable {
 
@@ -138,10 +135,10 @@ public class Round implements Serializable {
     }
 
     private void sendGameUpdate(Player nextPlayerTurn) {
-        if (nextPlayerTurn == null) return;
+        var pId = nextPlayerTurn == null ? -1 : nextPlayerTurn.getPlayerId();
 
         for (Player pLoop : game.getSession().getNoNullPlayers()) {
-            pLoop.sendGameUpdate(cells, nextPlayerTurn.getPlayerId(), game.getSession().getPlayersData());
+            pLoop.sendGameUpdate(cells, pId, game.getSession().getPlayersData());
         }
     }
 
@@ -160,34 +157,53 @@ public class Round implements Serializable {
     }
 
     public void acceptSurrender(Player pAcceptSurrender) {
-        if (!isPossibleToSurrender()) return;
+        if (!isPossibleToSurrender() || playerTurnId == -1) return;
 
         int pSurrenderId = pAcceptSurrender.getPlayerId();
         surrenderVote[pSurrenderId] = true;
 
         if (surrenderVote[0] && surrenderVote[1]) {
-            for (Player pLoop : game.getSession().getNoNullPlayers()) {
-                pLoop.sendData(ServerToClientEnum.MESSAGE, ServerToClientEnum.MessageEnum.SUCCESS_SURRENDER.name());
-            }
-
             int nbSeedRemaining = getCellRemaining();
 
             game.getSession().getPlayersData()[pSurrenderId].addScore(nbSeedRemaining / 2);
             game.getSession().getPlayersData()[(pSurrenderId + 1) % 2].addScore(nbSeedRemaining / 2);
+            Arrays.stream(cells).forEach(css -> Arrays.stream(css).forEach(Cell::clearSeed));
 
+            sendGameUpdate(null);
             processVictory(getWinnerId(null).orElse(-1));
+
+            game.getSession().getNoNullPlayers().forEach(pLoop ->
+                    pLoop.sendData(ServerToClientEnum.MESSAGE, ServerToClientEnum.MessageEnum.SUCCESS_SURRENDER.name())
+            );
         }
 
         resetSurrenderVote();
     }
 
     public void denySurrender() {
-        if (!isPossibleToSurrender()) return;
+        if (!isPossibleToSurrender() || playerTurnId == -1) return;
         resetSurrenderVote();
 
-        for (Player pLoop : game.getSession().getNoNullPlayers()) {
-            pLoop.sendData(ServerToClientEnum.MESSAGE, ServerToClientEnum.MessageEnum.FAIL_SURRENDER.name());
-        }
+        game.getSession().getNoNullPlayers().forEach(pLoop ->
+                pLoop.sendData(ServerToClientEnum.MESSAGE, ServerToClientEnum.MessageEnum.FAIL_SURRENDER.name())
+        );
+    }
+
+    public void soloSurrender(Player pSurrender) {
+        if (playerTurnId == -1) return;
+
+        var nbSeedRemaining = getCellRemaining();
+        var pSurrenderId = pSurrender.getPlayerId();
+
+        game.getSession().getPlayersData()[(pSurrenderId + 1) % 2].addScore(nbSeedRemaining);
+        Arrays.stream(cells).forEach(css -> Arrays.stream(css).forEach(Cell::clearSeed));
+
+        sendGameUpdate(null);
+        processVictory(getWinnerId(null).orElse(-1));
+
+        game.getSession().getNoNullPlayers().forEach(pLoop ->
+                pLoop.sendData(ServerToClientEnum.MESSAGE, ServerToClientEnum.MessageEnum.SUCCESS_SOLO_SURRENDER.name())
+        );
     }
 
     public void handleAskSurrenderVote(Player pAskSurrender) {
@@ -234,4 +250,5 @@ public class Round implements Serializable {
     public Game getGame() {
         return game;
     }
+
 }

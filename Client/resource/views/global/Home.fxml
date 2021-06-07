@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="container" prefHeight="600.0" prefWidth="300.0" style="-fx-background-color: #9D7E68;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="container" prefHeight="600.0" prefWidth="300.0" style="-fx-background-color: #9D7E68;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <VBox alignment="TOP_CENTER" prefHeight="175.0" prefWidth="300.0" spacing="15.0">
          <children>
@@ -37,7 +37,7 @@
                   <Font size="20.0" />
                </font>
             </Label>
-            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#saveMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.savematch">
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#saveMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.savematch">
                <padding>
                   <Insets left="20.0" />
                </padding>
@@ -45,7 +45,7 @@
                   <Font name="Helvetica 65 Medium" size="17.0" />
                </font>
             </Button>
-            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#loadMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.loadmatch">
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#loadMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.loadmatch">
                <padding>
                   <Insets left="20.0" />
                </padding>
@@ -53,7 +53,7 @@
                   <Font name="Helvetica 65 Medium" size="17.0" />
                </font>
             </Button>
-            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#surrender" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.surrender">
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#surrender" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.surrender">
                <padding>
                   <Insets left="20.0" />
                </padding>
@@ -61,7 +61,7 @@
                   <Font name="Helvetica 65 Medium" size="17.0" />
                </font>
             </Button>
-            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#newMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.newmatch">
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#newMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.newmatch">
                <padding>
                   <Insets left="20.0" />
                </padding>
@@ -69,7 +69,7 @@
                   <Font name="Helvetica 65 Medium" size="17.0" />
                </font>
             </Button>
-            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#stopMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.stopmatch">
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#stopMatch" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.stopmatch">
                <padding>
                   <Insets left="20.0" />
                </padding>
@@ -77,7 +77,7 @@
                   <Font name="Helvetica 65 Medium" size="17.0" />
                </font>
             </Button>
-            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onMouseClicked="#undo" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.undo">
+            <Button alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" onAction="#undo" prefHeight="35.0" prefWidth="300.0" stylesheets="@Home.css" text="%home.mancala.undo">
                <padding>
                   <Insets left="20.0" />
                </padding>

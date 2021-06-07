@@ -40,7 +40,7 @@ public class HomeController extends FXController {
 
     @FXML
     public void surrender() {
-
+        mancalaSocket.get().sendData(ClientToServerEnum.SOLO_SURRENDER);
     }
 
     @FXML

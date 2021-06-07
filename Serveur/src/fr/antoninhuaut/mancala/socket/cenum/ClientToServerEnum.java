@@ -13,6 +13,7 @@ public enum ClientToServerEnum {
     ASK_FOR_SURRENDER_VOTE,
     ACCEPT_SURRENDER,
     REFUSE_SURRENDER,
+    SOLO_SURRENDER,
 
     UNDO,
 

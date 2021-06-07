@@ -256,6 +256,7 @@ public class GameController extends FXController {
 
     public void setErrorLabel(String i18nKey) {
         if (errorLabel.textProperty().isBound()) errorLabel.textProperty().unbind();
+
         gameData.setErrorLabelTextProperty(I18NUtils.getInstance().bindStr("game.error." + i18nKey));
         errorLabel.textProperty().bind(gameData.errorLabelTextProperty());
 

@@ -37,6 +37,7 @@ public enum ServerToClientEnum {
         MATCH_LOAD_FROM_SAVE,
         SUCCESS_SURRENDER,
         FAIL_SURRENDER,
+        SUCCESS_SOLO_SURRENDER,
         STOP_MATCH;
     }
 }
