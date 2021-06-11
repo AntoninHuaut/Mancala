@@ -4,6 +4,7 @@ import fr.antoninhuaut.mancala.controller.socket.MancalaSocket;
 import fr.antoninhuaut.mancala.model.enums.ClientToServerEnum;
 import fr.antoninhuaut.mancala.utils.components.dialog.CodeDialog;
 import fr.antoninhuaut.mancala.utils.components.dialog.RuleDialog;
+import fr.antoninhuaut.mancala.utils.components.dialog.SettingsDialog;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -76,7 +77,7 @@ public class HomeController extends FXController {
 
     @FXML
     public void settings() {
-
+        new SettingsDialog("home.settings").showAndWait();
     }
 
     public void setMancalaSocket(MancalaSocket mancalaSocket) {

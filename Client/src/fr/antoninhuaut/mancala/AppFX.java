@@ -1,6 +1,7 @@
 package fr.antoninhuaut.mancala;
 
 import fr.antoninhuaut.mancala.controller.global.WindowController;
+import fr.antoninhuaut.mancala.utils.AudioManager;
 import fr.antoninhuaut.mancala.utils.FadeUtils;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
 import fr.antoninhuaut.mancala.view.global.WindowView;
@@ -57,6 +58,8 @@ public class AppFX extends Application {
         });
 
         this.stage.setOnCloseRequest(req -> System.exit(0));
+
+        new AudioManager();
     }
 
     public Stage getStage() {

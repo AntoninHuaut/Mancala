@@ -1,16 +1,16 @@
-.button {
+.button:not(.switch) {
     -fx-background-color: #10bb7f;
     -fx-border-color: #10bb7f;
     -fx-text-fill: white;
 }
 
-.button:hover {
+.button:hover:not(.switch) {
     -fx-background-color: #11d28e;
     -fx-border-color: #11d28e;
     -fx-text-fill: white;
 }
 
-.button:pressed {
+.button:pressed:not(.switch) {
     -fx-background-color: #1b6d4f;
     -fx-border-color: #1b6d4f;
     -fx-text-fill: white;
@@ -32,4 +32,34 @@
     -fx-background-color: #146C43;
     -fx-border-color: #146C43;
     -fx-text-fill: white;
+}
+
+.button.error {
+    -fx-background-color: #DC3545;
+    -fx-border-color: #DC3545;
+    -fx-text-fill: white;
+}
+
+.button.error:hover {
+    -fx-background-color: #af2835;
+    -fx-border-color: #af2835;
+    -fx-text-fill: white;
+}
+
+.button.error:pressed {
+    -fx-background-color: #f53346;
+    -fx-border-color: #f53346;
+    -fx-text-fill: white;
+}
+
+.button.switch {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 0.2, 0.0, 0.0, 2);
+}
+
+.button.switch.on {
+    -fx-background-color: #00893d;
+}
+
+.button.switch.off {
+    -fx-background-color: WHITE;
 }

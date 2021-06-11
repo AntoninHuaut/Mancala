@@ -16,8 +16,9 @@ public class IconDialog<T> extends Dialog<T> {
         Image img = AppFX.getInstance().getStage().getIcons().get(0);
         ((Stage) getDialogPane().getScene().getWindow()).getIcons().add(img);
         getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-        getDialogPane().getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource("/views/popup/AlertIcon.css")).toExternalForm()
+        getDialogPane().getStylesheets().addAll(
+                Objects.requireNonNull(getClass().getResource("/views/popup/AlertIcon.css")).toExternalForm(),
+                Objects.requireNonNull(getClass().getResource("/views/GlobalButton.css")).toExternalForm()
         );
     }
 }

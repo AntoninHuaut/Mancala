@@ -5,5 +5,10 @@ public enum UserPrefType {
     USERNAME,
     SOCKET_HOST,
     SOCKET_PORT,
-    LOCALE_PREF
+    LOCALE_PREF,
+
+    SEE_SEED_HOVER,
+    SEE_SEED,
+    SOUND,
+    MUSIC;
 }
