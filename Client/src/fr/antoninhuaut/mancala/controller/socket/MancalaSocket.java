@@ -5,6 +5,7 @@ import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.enums.ClientToServerEnum;
 import fr.antoninhuaut.mancala.model.enums.ServerToClientEnum;
 import fr.antoninhuaut.mancala.model.views.socket.SocketConnectionData;
+import fr.antoninhuaut.mancala.utils.AudioManager;
 import fr.antoninhuaut.mancala.utils.components.alert.ConfirmAlert;
 import fr.antoninhuaut.mancala.utils.components.alert.GenericAlert;
 import fr.antoninhuaut.mancala.utils.components.alert.HighscoreAlert;
@@ -66,6 +67,8 @@ public class MancalaSocket {
     }
 
     private void analyseRequest(ServerToClientEnum sEnum, String[] args) throws IOException {
+        AudioManager.getInstance().playSound(sEnum);
+
         switch (sEnum) {
             case WELCOME:
                 this.sessionId = args[2];

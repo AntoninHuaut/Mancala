@@ -59,7 +59,7 @@ public class AppFX extends Application {
 
         this.stage.setOnCloseRequest(req -> System.exit(0));
 
-        new AudioManager();
+        AudioManager.getInstance(); // Force init
     }
 
     public Stage getStage() {
