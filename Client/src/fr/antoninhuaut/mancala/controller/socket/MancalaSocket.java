@@ -67,7 +67,7 @@ public class MancalaSocket {
     }
 
     private void analyseRequest(ServerToClientEnum sEnum, String[] args) throws IOException {
-        AudioManager.getInstance().playSound(sEnum);
+        AudioManager.getInstance().playSTOC_Sound(sEnum);
 
         switch (sEnum) {
             case WELCOME:
@@ -156,6 +156,7 @@ public class MancalaSocket {
     }
 
     public void sendMove(int line, int col) {
+        AudioManager.getInstance().playCTOS_Sound(ClientToServerEnum.MOVE);
         sendData(ClientToServerEnum.MOVE, "" + line, "" + col);
     }
 

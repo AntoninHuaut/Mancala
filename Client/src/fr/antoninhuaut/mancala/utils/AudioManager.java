@@ -1,31 +1,37 @@
 package fr.antoninhuaut.mancala.utils;
 
+import fr.antoninhuaut.mancala.model.enums.ClientToServerEnum;
 import fr.antoninhuaut.mancala.model.enums.ServerToClientEnum;
 import fr.antoninhuaut.mancala.model.enums.UserPrefType;
 import javafx.beans.property.BooleanProperty;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
 
 public class AudioManager {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private static AudioManager instance;
 
-    private final MediaPlayer mediaPlayer;
+    private final MediaPlayer musicPlayer;
+    private MediaPlayer soundPlayer;
     private final BooleanProperty sound;
 
     private AudioManager() {
-        this.mediaPlayer = new MediaPlayer(new Media(getAudioPath("music.mp3")));
-        mediaPlayer.setVolume(getVolume(60));
-        mediaPlayer.setOnEndOfMedia(() -> mediaPlayer.seek(Duration.ZERO));
+        this.musicPlayer = new MediaPlayer(new Media(getAudioPath("music.mp3")));
+        musicPlayer.setVolume(getVolume(60));
+        musicPlayer.setOnEndOfMedia(() -> musicPlayer.seek(Duration.ZERO));
 
         this.sound = PreferenceUtils.getInstance().getSettingsPrefs().get(UserPrefType.SOUND);
         var music = PreferenceUtils.getInstance().getSettingsPrefs().get(UserPrefType.MUSIC);
 
         if (music.get()) {
-            mediaPlayer.play();
+            musicPlayer.play();
         }
 
         music.addListener((ob, o, n) -> {
@@ -35,32 +41,50 @@ public class AudioManager {
     }
 
     private void stopMusic() {
-        mediaPlayer.stop();
+        musicPlayer.stop();
     }
 
     private void startMusic() {
-        mediaPlayer.play();
+        musicPlayer.play();
     }
 
-    public void playSound(ServerToClientEnum sTOcEnum) {
-        if (!sound.get()) return;
+    public void playCTOS_Sound(ClientToServerEnum cTOsEnum) {
+        try {
+            switch (cTOsEnum) {
+                case MOVE:
+                    playSound(cTOsEnum.name().toLowerCase());
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception ignore) {
+        }
+    }
 
+    public void playSTOC_Sound(ServerToClientEnum sTOcEnum) {
         try {
             switch (sTOcEnum) {
                 case WELCOME:
                 case MESSAGE:
                 case END_ROUND:
                 case END_GAME:
-                    var soundPlayer = new MediaPlayer(new Media(getAudioPath("sound_" + sTOcEnum.name().toLowerCase() + ".mp3")));
-                    soundPlayer.setVolume(getVolume(75));
-                    soundPlayer.play();
+                    playSound(sTOcEnum.name().toLowerCase());
                     break;
                 default:
                     break;
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception ignore) {
         }
+    }
+
+    private void playSound(String soundPath) {
+        if (!sound.get()) return;
+        if (soundPlayer != null) soundPlayer.stop();
+
+        LOGGER.debug("Playing sound effect: {}", soundPath);
+        this.soundPlayer = new MediaPlayer(new Media(getAudioPath("sound_" + soundPath + ".mp3")));
+        soundPlayer.setVolume(getVolume(75));
+        soundPlayer.play();
     }
 
     private double getVolume(double volumeWant) {
