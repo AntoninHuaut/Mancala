@@ -31,7 +31,6 @@ public class AudioManager {
         mediaPlayer.setOnEndOfMedia(() -> mediaPlayer.seek(Duration.ZERO));
 
         if (music.get()) {
-            mediaPlayer.setStartTime(Duration.minutes(1.5));
             mediaPlayer.play();
         }
     }
