@@ -5,3 +5,9 @@
 .seedLabel {
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 10), 10, 0.1, 0, 0);
 }
+
+#backgroundPane {
+    -fx-background-image: url("../../img/background.jpg");
+    -fx-background-size: cover;
+    -fx-opacity: 0.35;
+}
