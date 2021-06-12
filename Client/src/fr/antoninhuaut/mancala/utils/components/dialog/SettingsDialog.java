@@ -28,9 +28,9 @@ public class SettingsDialog extends GenericDialog<Void> {
         super(key);
 
         this.grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+        grid.setHgap(15);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(20, 150, 0, 20));
         getDialogPane().setContent(grid);
 
         List<UserPrefType> settingsPref = Arrays.asList(SEE_SEED_HOVER, SEE_SEED, SOUND, MUSIC);
@@ -70,9 +70,10 @@ public class SettingsDialog extends GenericDialog<Void> {
     private void addConfigBoolean(UserPrefType prefType) {
         var switchBtn = new SwitchButton(PreferenceUtils.getInstance().getSettingsPrefs().get(prefType).get());
         switchBtn.setUserData(prefType);
-        grid.add(getLabel("settings." + prefType.name().toLowerCase()), 0, line);
-        grid.add(switchBtn, 1, line++);
+        grid.add(switchBtn, 0, line);
+        grid.add(getLabel("settings." + prefType.name().toLowerCase()), 1, line);
         prefMap.put(prefType, switchBtn);
+        line++;
     }
 
     private Label getLabel(String key) {
