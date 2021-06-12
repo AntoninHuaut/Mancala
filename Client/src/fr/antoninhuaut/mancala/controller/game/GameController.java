@@ -4,15 +4,16 @@ import fr.antoninhuaut.mancala.controller.global.FXController;
 import fr.antoninhuaut.mancala.controller.socket.MancalaSocket;
 import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.enums.ClientToServerEnum;
+import fr.antoninhuaut.mancala.model.enums.UserPrefType;
+import fr.antoninhuaut.mancala.model.views.game.CellData;
 import fr.antoninhuaut.mancala.model.views.game.GameData;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
+import fr.antoninhuaut.mancala.utils.PreferenceUtils;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -120,10 +121,28 @@ public class GameController extends FXController {
 
         for (var line = 0; line < 2; ++line) {
             for (var col = 0; col < 6; ++col) {
-                var cellLabel = (Label) gameGrid.getScene().lookup(String.format("#cell-%d-%d", line, col));
+                var cellStack = (StackPane) gameGrid.getScene().lookup(String.format("#cell-%d-%d", line, col));
+                var cellImage = (ImageView) cellStack.getChildren().get(0);
+                var cellLabel = (Label) cellStack.getChildren().get(1);
 
-                if (gameData.getCells()[line][col] == null) gameData.getCells()[line][col] = new SimpleStringProperty();
-                cellLabel.textProperty().bind(gameData.getCells()[line][col]);
+                CellData cellData;
+
+                if (gameData.getCells()[line][col] == null) {
+                    cellData = new CellData();
+                    gameData.getCells()[line][col] = cellData;
+                } else {
+                    cellData = gameData.getCells()[line][col];
+                }
+
+                BooleanProperty seeSeed = PreferenceUtils.getInstance().getSettingsPrefs().get(UserPrefType.SEE_SEED);
+                BooleanProperty seeSeedHover = PreferenceUtils.getInstance().getSettingsPrefs().get(UserPrefType.SEE_SEED_HOVER);
+
+                // seeSeed OR (seeSeedHover AND hoverProperty)
+                cellLabel.visibleProperty().bind(Bindings.or(seeSeed, Bindings.and(seeSeedHover, cellStack.hoverProperty())));
+                cellLabel.textProperty().bind(cellData.seedProperty());
+
+                cellData.setImageView(cellImage);
+                cellData.apply();
             }
         }
 
@@ -190,7 +209,7 @@ public class GameController extends FXController {
         for (var line = 0; line < cells.length; ++line) {
             for (var col = 0; col < cells[line].length; ++col) {
                 var cell = cells[line][col];
-                gameData.getCells()[line][col].set("" + cell.getNbSeed());
+                gameData.getCells()[line][col].setNbSeed(cell.getNbSeed());
                 nbCellsRemaining += cell.getNbSeed();
             }
         }

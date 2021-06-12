@@ -1,16 +1,16 @@
-.button:not(.switch) {
+.button.default {
     -fx-background-color: #10bb7f;
     -fx-border-color: #10bb7f;
     -fx-text-fill: white;
 }
 
-.button:hover:not(.switch) {
+.button.default {
     -fx-background-color: #11d28e;
     -fx-border-color: #11d28e;
     -fx-text-fill: white;
 }
 
-.button:pressed:not(.switch) {
+.button.default {
     -fx-background-color: #1b6d4f;
     -fx-border-color: #1b6d4f;
     -fx-text-fill: white;

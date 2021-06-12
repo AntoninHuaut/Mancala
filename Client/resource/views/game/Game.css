@@ -1,3 +1,7 @@
 .hboxTurn {
-    -fx-effect: dropshadow(three-pass-box, rgba(255, 255, 0,0.8), 10, 0, 0, 0);
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 255, 0, 0.8), 10, 0, 0, 0);
+}
+
+.seedLabel {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 10), 10, 0.1, 0, 0);
 }

@@ -20,7 +20,7 @@ public class GameData {
     private final StringProperty pTwoMatchLabelText = new SimpleStringProperty();
 
     private final DoubleProperty[] bols = new DoubleProperty[16];
-    private final StringProperty[][] cells = new StringProperty[2][6];
+    private final CellData[][] cells = new CellData[2][6];
 
     private final ObjectProperty<Color> infosLabelColor = new SimpleObjectProperty<>();
     private StringBinding infosLabelText, errorLabelText;
@@ -73,7 +73,7 @@ public class GameData {
         return pTwoScoreLabelText;
     }
 
-    public StringProperty[][] getCells() {
+    public CellData[][] getCells() {
         return cells;
     }
 
