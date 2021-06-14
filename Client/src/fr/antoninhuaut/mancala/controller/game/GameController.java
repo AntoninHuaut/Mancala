@@ -23,8 +23,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.*;
@@ -36,7 +34,6 @@ public class GameController extends FXController {
     private static final String RED_COLOR = "#FF0000";
     private static final String BLUE_COLOR = "#00B2EE";
     private static final String HBOXTURN_CLASS = "hboxTurn";
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private final HomeView homeView;
     private final MancalaSocket mancalaSocket;
@@ -78,8 +75,6 @@ public class GameController extends FXController {
 
     @Override
     public void postLoad() {
-        LOGGER.debug("GameController postLoad");
-
         if (gameData == null) {
             gameData = new GameData();
             waitOpponent();
@@ -202,8 +197,6 @@ public class GameController extends FXController {
     }
 
     public void updateGameState(Cell[][] cells, int playerTurnId, int pOneScore, int pTwoScore) {
-        LOGGER.debug("Updating game state [playerTurnId: {}, pOneScore: {}, pTwoScore: {}]", playerTurnId, pOneScore, pTwoScore);
-
         var nbCellsRemaining = 0;
 
         for (var line = 0; line < cells.length; ++line) {
