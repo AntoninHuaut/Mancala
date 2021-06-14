@@ -3,10 +3,7 @@ package fr.antoninhuaut.mancala.utils.components.alert;
 import fr.antoninhuaut.mancala.AppFX;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
 import fr.antoninhuaut.mancala.utils.UtilsFX;
-import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
 
 import java.util.Optional;
 
