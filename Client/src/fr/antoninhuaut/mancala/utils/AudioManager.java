@@ -7,10 +7,14 @@ import javafx.beans.property.BooleanProperty;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
 
 public class AudioManager {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static AudioManager instance;
 
@@ -77,6 +81,7 @@ public class AudioManager {
         if (!sound.get()) return;
         if (soundPlayer != null) soundPlayer.stop();
 
+        LOGGER.debug("Playing sound effect: {}", soundPath);
         this.soundPlayer = new MediaPlayer(new Media(getAudioPath("sound_" + soundPath + ".mp3")));
         soundPlayer.setVolume(getVolume(75));
         soundPlayer.play();

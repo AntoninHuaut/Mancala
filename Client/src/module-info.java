@@ -5,6 +5,7 @@ module fr.antoninhuaut.projet {
     requires javafx.fxml;
     requires javafx.web;
     requires javafx.media;
+    requires org.apache.logging.log4j;
 
     opens fr.antoninhuaut.mancala.controller.socket;
 
