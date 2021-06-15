@@ -1,9 +1,8 @@
 package fr.antoninhuaut.mancala;
 
-import fr.antoninhuaut.mancala.controller.global.WindowController;
 import fr.antoninhuaut.mancala.utils.AudioManager;
-import fr.antoninhuaut.mancala.utils.FadeUtils;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
+import fr.antoninhuaut.mancala.utils.UtilsFX;
 import fr.antoninhuaut.mancala.view.global.WindowView;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -53,7 +52,7 @@ public class AppFX extends Application {
         this.stage = primaryStage;
         this.stage.iconifiedProperty().addListener((ob, o, n) -> {
             if (!n) {
-                FadeUtils.fade(this.stage, true);
+                UtilsFX.fade(this.stage, true);
             }
         });
 

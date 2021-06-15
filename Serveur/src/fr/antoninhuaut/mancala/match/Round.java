@@ -1,9 +1,7 @@
 package fr.antoninhuaut.mancala.match;
 
 import fr.antoninhuaut.mancala.model.Cell;
-import fr.antoninhuaut.mancala.model.Move;
 import fr.antoninhuaut.mancala.model.MoveEnum;
-import fr.antoninhuaut.mancala.model.PlayerData;
 import fr.antoninhuaut.mancala.save.HighscoreManager;
 import fr.antoninhuaut.mancala.socket.Player;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
@@ -161,7 +159,7 @@ public class Round implements Serializable {
     }
 
     public void acceptSurrender(Player pAcceptSurrender) {
-        if (!isPossibleToSurrender() || playerTurnId == -1) return;
+        if (getGame().getSession().getNbPlayer() != 2 || !isPossibleToSurrender() || playerTurnId == -1) return;
 
         int pSurrenderId = pAcceptSurrender.getPlayerId();
         surrenderVote[pSurrenderId] = true;
@@ -185,7 +183,7 @@ public class Round implements Serializable {
     }
 
     public void denySurrender() {
-        if (!isPossibleToSurrender() || playerTurnId == -1) return;
+        if (getGame().getSession().getNbPlayer() != 2 || !isPossibleToSurrender() || playerTurnId == -1) return;
         resetSurrenderVote();
 
         game.getSession().getNoNullPlayers().forEach(pLoop ->
@@ -194,7 +192,7 @@ public class Round implements Serializable {
     }
 
     public void soloSurrender(Player pSurrender) {
-        if (playerTurnId == -1) return;
+        if (getGame().getSession().getNbPlayer() != 2 || playerTurnId == -1) return;
 
         var nbSeedRemaining = getCellRemaining();
         var pSurrenderId = pSurrender.getPlayerId();
@@ -211,7 +209,7 @@ public class Round implements Serializable {
     }
 
     public void handleAskSurrenderVote(Player pAskSurrender) {
-        if (!isPossibleToSurrender()) return;
+        if (getGame().getSession().getNbPlayer() != 2 || !isPossibleToSurrender()) return;
         if (playerTurnId != pAskSurrender.getPlayerId()) {
             throw new IllegalStateException(ServerToClientEnum.MessageEnum.NOT_YOUR_TURN.name());
         }

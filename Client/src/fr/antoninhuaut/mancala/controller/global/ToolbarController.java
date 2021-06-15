@@ -1,7 +1,6 @@
 package fr.antoninhuaut.mancala.controller.global;
 
-import fr.antoninhuaut.mancala.utils.FadeUtils;
-import javafx.application.Platform;
+import fr.antoninhuaut.mancala.utils.UtilsFX;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -41,7 +40,7 @@ public class ToolbarController extends FXController {
     }
 
     public void reduceApp() {
-        FadeUtils.fade(this.stage, false);
+        UtilsFX.fade(this.stage, false);
     }
 
     public void exitApp() {

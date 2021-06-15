@@ -1,6 +1,9 @@
-package fr.antoninhuaut.mancala.model;
+package fr.antoninhuaut.mancala.match;
 
 import fr.antoninhuaut.mancala.match.Round;
+import fr.antoninhuaut.mancala.model.Cell;
+import fr.antoninhuaut.mancala.model.MoveEnum;
+import fr.antoninhuaut.mancala.model.PlayerData;
 
 import java.io.Serializable;
 import java.util.ArrayList;

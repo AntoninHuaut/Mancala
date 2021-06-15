@@ -7,6 +7,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class HighscoreAlert extends GenericAlert {
@@ -37,7 +38,13 @@ public class HighscoreAlert extends GenericAlert {
     }
 
     private String formatHighscore(String highscore) {
-        var listHS = Arrays.stream(highscore.split(System.getProperty("line.separator"))).map(Highscore::new).collect(Collectors.toList());
+        var listHS = Arrays.stream(highscore.split(System.getProperty("line.separator"))).map(el -> {
+            try {
+                return new Highscore(el);
+            } catch (IllegalStateException ignore) {
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList());
         var listStr = listHS.stream().map(high -> I18NUtils.getInstance().get("home.highscore.format", high.getUsername(), high.getNbSeed())).collect(Collectors.toList());
         return listStr.stream().collect(Collectors.joining(System.getProperty("line.separator")));
     }
@@ -47,15 +54,19 @@ public class HighscoreAlert extends GenericAlert {
         private final int nbSeed;
         private final String username;
 
-        public Highscore(String strSerialize) {
+        public Highscore(String strSerialize) throws IllegalStateException {
             String[] parts = strSerialize.split(" ");
-            this.nbSeed = Integer.parseInt(parts[0]);
-            this.username = parts[1];
-        }
 
-        public Highscore(int nbSeed, String username) {
-            this.nbSeed = nbSeed;
-            this.username = username;
+            try {
+                this.nbSeed = Integer.parseInt(parts[0]);
+            } catch (NumberFormatException ignore) {
+                throw new IllegalStateException();
+            }
+            try {
+                this.username = parts[1];
+            } catch (ArrayIndexOutOfBoundsException ignore) {
+                throw new IllegalStateException();
+            }
         }
 
         public int getNbSeed() {
