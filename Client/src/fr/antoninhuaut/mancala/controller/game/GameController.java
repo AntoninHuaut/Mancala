@@ -169,6 +169,7 @@ public class GameController extends FXController {
         stackPlayerTwo.visibleProperty().bind(gameData.stackPlayerTwoVisibilityProperty());
 
         surrenderBtn.disableProperty().bind(gameData.surrenderBtnDisableProperty());
+        surrenderBtn.visibleProperty().bind(gameData.gameGridVisibilityProperty());
 
         setTurnLabel();
 

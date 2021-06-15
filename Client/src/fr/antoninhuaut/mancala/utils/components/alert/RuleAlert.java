@@ -1,17 +1,15 @@
-package fr.antoninhuaut.mancala.utils.components.dialog;
+package fr.antoninhuaut.mancala.utils.components.alert;
 
+import fr.antoninhuaut.mancala.AppFX;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
-import javafx.scene.web.WebView;
+import javafx.application.Platform;
 
-public class RuleDialog extends GenericDialog<Void> {
+public class RuleAlert extends GenericAlert {
 
-    public RuleDialog(String key) {
-        super(key);
+    public RuleAlert(String key) {
+        super(AlertType.INFORMATION, key);
 
-        var webView = new WebView();
-        this.getDialogPane().setContent(webView);
-        webView.getEngine().load(getURLByLang());
-        getDialogPane().getButtonTypes().remove(getSubmitButtonType());
+        Platform.runLater(() -> AppFX.getInstance().getHostServices().showDocument(getURLByLang()));
     }
 
     private String getURLByLang() {
