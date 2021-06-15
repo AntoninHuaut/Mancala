@@ -6,46 +6,65 @@ import fr.antoninhuaut.mancala.model.enums.UserPrefType;
 import javafx.beans.property.BooleanProperty;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
+import java.util.Random;
 
 public class AudioManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
+    private static final int nbAvailableMusic = 3;
+    private static final long noActionDelayMs = 300;
     private static AudioManager instance;
 
-    private final MediaPlayer musicPlayer;
     private MediaPlayer soundPlayer;
     private final BooleanProperty sound;
 
+    private MediaPlayer musicPlayer;
+    private long lastAction = 0;
+    private int currentMusic;
+
     private AudioManager() {
-        this.musicPlayer = new MediaPlayer(new Media(getAudioPath("music.mp3")));
-        musicPlayer.setVolume(getVolume(60));
-        musicPlayer.setOnEndOfMedia(() -> musicPlayer.seek(Duration.ZERO));
-
         this.sound = PreferenceUtils.getInstance().getSettingsPrefs().get(UserPrefType.SOUND);
-        var music = PreferenceUtils.getInstance().getSettingsPrefs().get(UserPrefType.MUSIC);
-
-        if (music.get()) {
-            musicPlayer.play();
-        }
-
-        music.addListener((ob, o, n) -> {
-            if (n) startMusic();
-            else stopMusic();
-        });
+        this.currentMusic = new Random().nextInt(nbAvailableMusic) + 1;
+        LOGGER.debug("currentMusic: {}", currentMusic);
+        startMusic();
     }
 
     private void stopMusic() {
+        if (musicPlayer == null) return;
+
+        LOGGER.debug("stopMusic");
         musicPlayer.stop();
     }
 
     private void startMusic() {
-        musicPlayer.play();
+        var music = PreferenceUtils.getInstance().getSettingsPrefs().get(UserPrefType.MUSIC);
+        music.addListener((ob, o, n) -> {
+            if (lastAction + noActionDelayMs > System.currentTimeMillis()) return; // Fix the double call of the javafx observer
+            lastAction = System.currentTimeMillis();
+
+            if (n) startMusic();
+            else stopMusic();
+        });
+
+        if (!music.get()) return;
+        stopMusic();
+
+        var musicPath = String.format("music%d.mp3", currentMusic);
+        LOGGER.debug("startMusic: {}", musicPath);
+
+        musicPlayer = new MediaPlayer(new Media(getAudioPath(musicPath)));
+        musicPlayer.setVolume(getVolume(60));
+        musicPlayer.setOnEndOfMedia(this::startMusic);
+
+        currentMusic = currentMusic + 1 > nbAvailableMusic ? 1 : currentMusic + 1;
+
+        if (music.get()) {
+            musicPlayer.play();
+        }
     }
 
     public void playCTOS_Sound(ClientToServerEnum cTOsEnum) {
