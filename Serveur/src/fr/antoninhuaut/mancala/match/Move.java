@@ -1,6 +1,5 @@
 package fr.antoninhuaut.mancala.match;
 
-import fr.antoninhuaut.mancala.match.Round;
 import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.MoveEnum;
 import fr.antoninhuaut.mancala.model.PlayerData;
@@ -11,7 +10,7 @@ import java.util.List;
 
 public class Move implements Serializable {
 
-    private transient Round round;
+    private transient PlayerData[] playersData;
     private Cell[][] roundCells;
     private Cell[][] initialCells;
     private Cell[][] finalCells;
@@ -32,8 +31,8 @@ public class Move implements Serializable {
         this.finalCells = deepCopy(cells);
     }
 
-    public void init(Cell[][] cells, Round round) {
-        this.round = round;
+    public void init(Cell[][] cells, PlayerData[] playersData) {
+        this.playersData = playersData;
         this.roundCells = cells;
     }
 
@@ -184,7 +183,7 @@ public class Move implements Serializable {
     }
 
     private PlayerData getCurrentPData() {
-        return round.getGame().getSession().getPlayersData()[currentPlayerId];
+        return playersData[currentPlayerId];
     }
 
     private Cell[][] deepCopy(Cell[][] cells) {

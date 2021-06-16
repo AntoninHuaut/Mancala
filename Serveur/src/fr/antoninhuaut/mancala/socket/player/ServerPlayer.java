@@ -76,11 +76,10 @@ public class ServerPlayer {
                 var clientCommand = ClientToServerEnum.extractFromCommand(arguments[0]);
                 switch (clientCommand) {
                     case MOVE:
-                        var moveData = inputData.split(" ");
-                        session.getGame().getCurrentRound().play(this, Integer.parseInt(moveData[1]), Integer.parseInt(moveData[2]));
+                        session.getGame().getCurrentRound().play(this, Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2]));
                         break;
                     case PLAY_WITH_BOT:
-                        session.addBot();
+                        session.addBot(arguments[1]);
                         break;
                     case NEW_MATCH:
                         session.stopAndStartNewGame();

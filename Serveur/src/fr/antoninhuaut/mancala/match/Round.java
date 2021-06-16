@@ -45,7 +45,7 @@ public class Round implements Serializable {
         this.game = game;
 
         if (lastMove != null) {
-            lastMove.init(cells, this);
+            lastMove.init(cells, getGame().getSession().getPlayersData());
         }
         return this;
     }
@@ -81,7 +81,7 @@ public class Round implements Serializable {
         var pData = game.getSession().getPlayersData()[currentPlayer.getPlayerId()];
 
         this.lastMove = new Move(cells, pData);
-        this.lastMove.init(cells, this);
+        this.lastMove.init(cells, getGame().getSession().getPlayersData());
 
         var moveEnum = this.lastMove.doMove(linePlayed, colPlayed);
         LOGGER.debug("Move: {} - isSuccess: {}", moveEnum, moveEnum.isSuccess());

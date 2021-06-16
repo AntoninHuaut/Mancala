@@ -9,6 +9,9 @@ import fr.antoninhuaut.mancala.save.exception.SaveLoadException;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 import fr.antoninhuaut.mancala.socket.player.ClientBotPlayer;
 import fr.antoninhuaut.mancala.socket.player.ServerPlayer;
+import fr.antoninhuaut.mancala.socket.player.bot.CellMostSeedStrategy;
+import fr.antoninhuaut.mancala.socket.player.bot.RandomStrategy;
+import fr.antoninhuaut.mancala.socket.player.bot.Strategy;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -21,7 +24,7 @@ import java.util.stream.Stream;
 public class Session {
 
     private static final Random random = new Random();
-    private static final int sessionIdLength = 5;
+    private static final int SESSION_ID_LENGTH = 5;
 
     private final String sessionId;
 
@@ -49,12 +52,21 @@ public class Session {
         return nbPlayer;
     }
 
-    public void addBot() {
+    public void addBot(String strStrategy) {
         if (getNbPlayer() >= 2) return;
 
         var server = MancalaServer.getInstance();
         try {
-            server.getPool().execute(new ClientBotPlayer(server.getPort()));
+            Strategy strategy = null;
+            if (strStrategy.equalsIgnoreCase("random")) {
+                strategy = new RandomStrategy();
+            } else if (strStrategy.equalsIgnoreCase("mostseedcell")) {
+                strategy = new CellMostSeedStrategy();
+            }
+
+            if (strategy == null) return;
+
+            server.getPool().execute(new ClientBotPlayer(strategy, server.getPort()));
         } catch (IOException ignored) {
         }
     }
@@ -145,7 +157,7 @@ public class Session {
     private String generateSessionId() {
         return random.ints(48, 123)
                 .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-                .limit(sessionIdLength)
+                .limit(SESSION_ID_LENGTH)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString().toUpperCase();
     }

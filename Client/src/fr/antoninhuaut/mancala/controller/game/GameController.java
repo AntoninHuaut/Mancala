@@ -9,6 +9,7 @@ import fr.antoninhuaut.mancala.model.views.game.CellData;
 import fr.antoninhuaut.mancala.model.views.game.GameData;
 import fr.antoninhuaut.mancala.utils.I18NUtils;
 import fr.antoninhuaut.mancala.utils.PreferenceUtils;
+import fr.antoninhuaut.mancala.utils.components.alert.BotStrategyAlert;
 import fr.antoninhuaut.mancala.view.global.HomeView;
 import fr.antoninhuaut.mancala.view.socket.SocketConnectionView;
 import javafx.beans.binding.Bindings;
@@ -205,7 +206,9 @@ public class GameController extends FXController {
 
     @FXML
     public void playWithBot() {
-        mancalaSocket.sendData(ClientToServerEnum.PLAY_WITH_BOT);
+        new BotStrategyAlert("game.bot",
+                (strategyType) -> mancalaSocket.sendData(ClientToServerEnum.PLAY_WITH_BOT, strategyType))
+                .showAndWait();
     }
 
     public void updateGameState(Cell[][] cells, int playerTurnId, int pOneScore, int pTwoScore) {
