@@ -3,3 +3,4 @@ target/
 saves/
 out/
 *.iml
+highscore.txt

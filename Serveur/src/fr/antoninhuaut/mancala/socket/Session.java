@@ -2,11 +2,13 @@ package fr.antoninhuaut.mancala.socket;
 
 import fr.antoninhuaut.mancala.match.Game;
 import fr.antoninhuaut.mancala.model.PlayerData;
-import fr.antoninhuaut.mancala.save.exception.SaveException;
-import fr.antoninhuaut.mancala.save.exception.SaveLoadException;
 import fr.antoninhuaut.mancala.save.SaveManager;
 import fr.antoninhuaut.mancala.save.SaveState;
+import fr.antoninhuaut.mancala.save.exception.SaveException;
+import fr.antoninhuaut.mancala.save.exception.SaveLoadException;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
+import fr.antoninhuaut.mancala.socket.player.ClientBotPlayer;
+import fr.antoninhuaut.mancala.socket.player.ServerPlayer;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -27,8 +29,8 @@ public class Session {
 
     private Game game;
 
-    private Player pOne;
-    private Player pTwo;
+    private ServerPlayer pOne;
+    private ServerPlayer pTwo;
 
     public Session() {
         for (var i = 0; i < playersData.length; i++) {
@@ -47,7 +49,19 @@ public class Session {
         return nbPlayer;
     }
 
-    public void addPlayer(Player p) throws IOException, ClassNotFoundException {
+    public void addBot() {
+        if (getNbPlayer() >= 2) return;
+
+        var server = MancalaServer.getInstance();
+        try {
+            server.getPool().execute(new ClientBotPlayer(server.getPort()));
+        } catch (IOException ignored) {
+        }
+    }
+
+    public void addPlayer(ServerPlayer p) throws IOException, ClassNotFoundException {
+        if (getNbPlayer() >= 2) return;
+
         boolean isPlayerOne;
 
         if (pOne == null) {
@@ -62,7 +76,7 @@ public class Session {
         game.addPlayer(p);
     }
 
-    public void removePlayer(Player p) {
+    public void removePlayer(ServerPlayer p) {
         if (pOne != null && pOne.equals(p)) {
             pOne = null;
         } else if (pTwo != null && pTwo.equals(p)) {
@@ -99,7 +113,7 @@ public class Session {
         getNoNullPlayers().forEach(p -> p.sendData(ServerToClientEnum.MESSAGE, request.name()));
     }
 
-    public void saveGame(Player p) {
+    public void saveGame(ServerPlayer p) {
         var saveState = new SaveState().setPlayerData(playersData).setGame(getGame());
         try {
             SaveManager.getInstance().saveGame(getSessionId(), saveState);
@@ -109,7 +123,7 @@ public class Session {
         }
     }
 
-    public void loadGame(Player p, String saveName) {
+    public void loadGame(ServerPlayer p, String saveName) {
         try {
             stopGame();
             var saveState = SaveManager.getInstance().loadSave(saveName);
@@ -148,19 +162,19 @@ public class Session {
         return game;
     }
 
-    public Player getPOne() {
+    public ServerPlayer getPOne() {
         return pOne;
     }
 
-    public Player getPTwo() {
+    public ServerPlayer getPTwo() {
         return pTwo;
     }
 
-    public Player getOppositePlayer(Player playerAtm) {
+    public ServerPlayer getOppositePlayer(ServerPlayer playerAtm) {
         return playerAtm.equals(getPOne()) ? getPTwo() : getPOne();
     }
 
-    public List<Player> getNoNullPlayers() {
+    public List<ServerPlayer> getNoNullPlayers() {
         return Stream.of(pOne, pTwo).filter(Objects::nonNull).collect(Collectors.toList());
     }
 

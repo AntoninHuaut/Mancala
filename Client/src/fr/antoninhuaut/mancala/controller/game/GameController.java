@@ -59,7 +59,7 @@ public class GameController extends FXController {
     public HBox pOneBox, pTwoBox;
 
     @FXML
-    public Button surrenderBtn;
+    public Button surrenderBtn, playWithBotBtn;
 
     @FXML
     public ImageView bol00, bol01, bol02, bol03, bol04, bol05, bol10, bol11, bol12, bol13, bol14, bol15;
@@ -170,6 +170,7 @@ public class GameController extends FXController {
 
         surrenderBtn.disableProperty().bind(gameData.surrenderBtnDisableProperty());
         surrenderBtn.visibleProperty().bind(gameData.gameGridVisibilityProperty());
+        playWithBotBtn.visibleProperty().bind(gameData.playWithBotBtnVisibilityProperty());
 
         setTurnLabel();
 
@@ -200,6 +201,11 @@ public class GameController extends FXController {
     @FXML
     public void suggestSurender() {
         mancalaSocket.sendData(ClientToServerEnum.ASK_FOR_SURRENDER_VOTE);
+    }
+
+    @FXML
+    public void playWithBot() {
+        mancalaSocket.sendData(ClientToServerEnum.PLAY_WITH_BOT);
     }
 
     public void updateGameState(Cell[][] cells, int playerTurnId, int pOneScore, int pTwoScore) {
@@ -239,6 +245,7 @@ public class GameController extends FXController {
         this.isYourTurn = isYourTurn;
         setTurnLabel();
         gameData.gameGridVisibilityProperty().set(true);
+        gameData.playWithBotBtnVisibilityProperty().set(false);
     }
 
     private void resetHBox() {
@@ -260,6 +267,7 @@ public class GameController extends FXController {
     public void waitOpponent() {
         gameData.playersNameLabelVisiblityProperty().set(false);
         gameData.gameGridVisibilityProperty().set(false);
+        gameData.playWithBotBtnVisibilityProperty().set(true);
         isYourTurn = null;
         setInfosLabel("game.info.wait_opponent", BLACK_COLOR);
     }

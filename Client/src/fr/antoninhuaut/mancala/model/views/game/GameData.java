@@ -12,6 +12,7 @@ public class GameData {
     private final BooleanProperty playersNameLabelVisiblity = new SimpleBooleanProperty(false);
     private final BooleanProperty errorLabelVisibility = new SimpleBooleanProperty(false);
     private final BooleanProperty surrenderBtnDisable = new SimpleBooleanProperty(true);
+    private final BooleanProperty playWithBotBtnVisibility = new SimpleBooleanProperty(false);
 
     private final StringProperty playersNameLabelText = new SimpleStringProperty();
     private final StringProperty pOneScoreLabelText = new SimpleStringProperty();
@@ -27,6 +28,10 @@ public class GameData {
 
     public BooleanProperty surrenderBtnDisableProperty() {
         return surrenderBtnDisable;
+    }
+
+    public BooleanProperty playWithBotBtnVisibilityProperty() {
+        return playWithBotBtnVisibility;
     }
 
     public StringProperty pOneMatchLabelTextProperty() {

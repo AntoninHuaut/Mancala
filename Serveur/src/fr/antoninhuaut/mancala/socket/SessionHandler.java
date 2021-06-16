@@ -1,5 +1,6 @@
 package fr.antoninhuaut.mancala.socket;
 
+import fr.antoninhuaut.mancala.socket.player.ServerPlayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,7 +24,7 @@ public class SessionHandler implements Runnable {
     @Override
     public void run() {
         try {
-            var p = new Player(socket);
+            var p = new ServerPlayer(socket);
             getSessionOrCreateOne().addPlayer(p);
             p.listenClient();
         } catch (IOException | ClassNotFoundException ex) {

@@ -11,19 +11,38 @@ import java.util.concurrent.Executors;
 public class MancalaServer {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    private static MancalaServer instance;
+
+    private final ExecutorService pool;
+    private final int port;
 
     public MancalaServer(int port) throws IOException {
+        MancalaServer.instance = this;
+        this.port = port;
+
         LOGGER.info("MancalaServer starting on port {}", port);
 
         try (var listener = new ServerSocket(port)) {
             LOGGER.info("MancalaServer is running...");
-            ExecutorService pool = Executors.newFixedThreadPool(200);
+            this.pool = Executors.newFixedThreadPool(200);
 
             while (true) {
                 pool.execute(new SessionHandler(listener.accept()));
                 LOGGER.debug("Player joined");
             }
         }
+    }
+
+    public ExecutorService getPool() {
+        return pool;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public static MancalaServer getInstance() {
+        return instance;
     }
 
     public static void main(String[] args) throws Exception {

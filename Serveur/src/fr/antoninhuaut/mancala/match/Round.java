@@ -3,7 +3,7 @@ package fr.antoninhuaut.mancala.match;
 import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.MoveEnum;
 import fr.antoninhuaut.mancala.save.HighscoreManager;
-import fr.antoninhuaut.mancala.socket.Player;
+import fr.antoninhuaut.mancala.socket.player.ServerPlayer;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,7 +67,7 @@ public class Round implements Serializable {
         sendGameUpdate(currentPlayer);
     }
 
-    public synchronized void play(Player player, int linePlayed, int colPlayed) {
+    public synchronized void play(ServerPlayer player, int linePlayed, int colPlayed) {
         if (game.isGameFinished()) return;
 
         var currentPlayer = getCurrentPlayer();
@@ -136,10 +136,10 @@ public class Round implements Serializable {
         this.lastMove = null; // Prevent double undo
     }
 
-    private void sendGameUpdate(Player nextPlayerTurn) {
+    private void sendGameUpdate(ServerPlayer nextPlayerTurn) {
         var pId = nextPlayerTurn == null ? -1 : nextPlayerTurn.getPlayerId();
 
-        for (Player pLoop : game.getSession().getNoNullPlayers()) {
+        for (ServerPlayer pLoop : game.getSession().getNoNullPlayers()) {
             pLoop.sendGameUpdate(cells, pId, game.getSession().getPlayersData());
         }
     }
@@ -158,7 +158,7 @@ public class Round implements Serializable {
         return getCellRemaining() <= 10;
     }
 
-    public void acceptSurrender(Player pAcceptSurrender) {
+    public void acceptSurrender(ServerPlayer pAcceptSurrender) {
         if (getGame().getSession().getNbPlayer() != 2 || !isPossibleToSurrender() || playerTurnId == -1) return;
 
         int pSurrenderId = pAcceptSurrender.getPlayerId();
@@ -191,7 +191,7 @@ public class Round implements Serializable {
         );
     }
 
-    public void soloSurrender(Player pSurrender) {
+    public void soloSurrender(ServerPlayer pSurrender) {
         if (getGame().getSession().getNbPlayer() != 2 || playerTurnId == -1) return;
 
         var nbSeedRemaining = getCellRemaining();
@@ -208,7 +208,7 @@ public class Round implements Serializable {
         );
     }
 
-    public void handleAskSurrenderVote(Player pAskSurrender) {
+    public void handleAskSurrenderVote(ServerPlayer pAskSurrender) {
         if (getGame().getSession().getNbPlayer() != 2 || !isPossibleToSurrender()) return;
         if (playerTurnId != pAskSurrender.getPlayerId()) {
             throw new IllegalStateException(ServerToClientEnum.MessageEnum.NOT_YOUR_TURN.name());
@@ -217,7 +217,7 @@ public class Round implements Serializable {
         resetSurrenderVote();
         surrenderVote[pAskSurrender.getPlayerId()] = true;
 
-        for (Player pLoop : game.getSession().getNoNullPlayers()) {
+        for (ServerPlayer pLoop : game.getSession().getNoNullPlayers()) {
             if (!pLoop.equals(pAskSurrender)) {
                 pLoop.sendData(ServerToClientEnum.ASK_TO_SURRENDER);
             }
@@ -239,11 +239,11 @@ public class Round implements Serializable {
         return Optional.empty();
     }
 
-    private Player getCurrentPlayer() {
+    private ServerPlayer getCurrentPlayer() {
         return getPlayerById(playerTurnId);
     }
 
-    private Player getPlayerById(int id) {
+    private ServerPlayer getPlayerById(int id) {
         if (id == 0) return game.getSession().getPOne();
         else if (id == 1) return game.getSession().getPTwo();
         else return null;

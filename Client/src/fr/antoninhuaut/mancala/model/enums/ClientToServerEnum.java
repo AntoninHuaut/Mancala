@@ -3,6 +3,7 @@ package fr.antoninhuaut.mancala.model.enums;
 public enum ClientToServerEnum {
 
     CLIENT_INIT,
+    PLAY_WITH_BOT,
     MOVE,
 
     SAVE_MATCH,

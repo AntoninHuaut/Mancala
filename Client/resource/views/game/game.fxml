@@ -47,7 +47,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@Game.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@Game.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <AnchorPane id="backgroundPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
         <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
@@ -394,11 +394,20 @@
                                         <Font name="Segoe UI" size="26.0" />
                                     </font>
                                 </Label>
-                                <Button fx:id="surrenderBtn" mnemonicParsing="false" onAction="#suggestSurender" styleClass="default" stylesheets="@../GlobalButton.css" text="%game.button.surrender">
-                                    <font>
-                                        <Font size="16.0" />
-                                    </font>
-                                </Button>
+                        <StackPane prefHeight="150.0" prefWidth="200.0">
+                           <children>
+                                      <Button fx:id="surrenderBtn" mnemonicParsing="false" onAction="#suggestSurender" styleClass="default" stylesheets="@../GlobalButton.css" text="%game.button.surrender">
+                                          <font>
+                                              <Font size="16.0" />
+                                          </font>
+                                      </Button>
+                              <Button fx:id="playWithBotBtn" mnemonicParsing="false" onAction="#playWithBot" styleClass="default" stylesheets="@../GlobalButton.css" text="%game.button.playwithbot">
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </StackPane>
                             </children>
                         </HBox>
                     </children>

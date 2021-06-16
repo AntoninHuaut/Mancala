@@ -1,9 +1,10 @@
-package fr.antoninhuaut.mancala.socket;
+package fr.antoninhuaut.mancala.socket.player;
 
 import fr.antoninhuaut.mancala.match.Round;
 import fr.antoninhuaut.mancala.model.Cell;
 import fr.antoninhuaut.mancala.model.PlayerData;
 import fr.antoninhuaut.mancala.save.HighscoreManager;
+import fr.antoninhuaut.mancala.socket.Session;
 import fr.antoninhuaut.mancala.socket.cenum.ClientToServerEnum;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 import org.apache.logging.log4j.LogManager;
@@ -15,31 +16,30 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Objects;
 
-public class Player {
+public class ServerPlayer {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    protected static final Logger LOGGER = LogManager.getLogger();
 
-    private final Socket socket;
-    private ObjectInputStream input;
-    private ObjectOutputStream output;
+    protected final Socket serverSocket;
+    protected ObjectInputStream serverInput;
+    protected ObjectOutputStream serverOutput;
 
     /* Init by Game */
-    private boolean isPlayerOne;
-    private Session session;
+    protected boolean isPlayerOne;
+    protected Session session;
 
-    public Player(Socket socket) {
-        this.socket = socket;
+    public ServerPlayer(Socket serverSocket) throws IOException {
+        this.serverSocket = serverSocket;
+        this.serverInput = new ObjectInputStream(serverSocket.getInputStream());
+        this.serverOutput = new ObjectOutputStream(serverSocket.getOutputStream());
     }
 
     public void waitSessionSetup(Session session, boolean isPlayerOne) throws IOException, ClassNotFoundException {
         this.session = session;
         this.isPlayerOne = isPlayerOne;
 
-        this.input = new ObjectInputStream(socket.getInputStream());
-        this.output = new ObjectOutputStream(socket.getOutputStream());
-
         try {
-            String inputData = (String) input.readObject();
+            String inputData = (String) serverInput.readObject();
             String[] arguments = inputData.split(" ");
             LOGGER.debug("SETUP: {}", inputData);
 
@@ -51,10 +51,6 @@ public class Player {
         }
     }
 
-    public void gameSetup() {
-        sendData(ServerToClientEnum.WELCOME, "PLAYER_" + (isPlayerOne ? "ONE" : "TWO"), session.getSessionId());
-    }
-
     public void listenClient() {
         try {
             processCommands();
@@ -64,7 +60,7 @@ public class Player {
             session.removePlayer(this);
 
             try {
-                socket.close();
+                serverSocket.close();
             } catch (IOException ignored) {
             }
         }
@@ -73,7 +69,7 @@ public class Player {
     private void processCommands() throws IOException, ClassNotFoundException {
         while (true) {
             try {
-                String inputData = (String) input.readObject();
+                String inputData = (String) serverInput.readObject();
                 String[] arguments = inputData.split(" ");
                 LOGGER.debug("Receive from {}/{}: {}", session.getPlayersData()[getPlayerId()].getUsername(), getPlayerId(), inputData);
 
@@ -82,6 +78,9 @@ public class Player {
                     case MOVE:
                         var moveData = inputData.split(" ");
                         session.getGame().getCurrentRound().play(this, Integer.parseInt(moveData[1]), Integer.parseInt(moveData[2]));
+                        break;
+                    case PLAY_WITH_BOT:
+                        session.addBot();
                         break;
                     case NEW_MATCH:
                         session.stopAndStartNewGame();
@@ -124,31 +123,36 @@ public class Player {
         }
     }
 
+    public void gameSetup() {
+        sendData(ServerToClientEnum.WELCOME, "PLAYER_" + (isPlayerOne ? "ONE" : "TWO"), session.getSessionId());
+    }
+
     public void sendData(ServerToClientEnum data, String... args) {
         try {
+            LOGGER.debug("Send data: {}, {}", data, args);
             var strArgs = String.join(" ", args);
-            output.writeObject(data.name() + (strArgs.isEmpty() ? "" : " " + strArgs));
+            serverOutput.writeObject(data.name() + (strArgs.isEmpty() ? "" : " " + strArgs));
         } catch (IOException ignored) {
         }
     }
 
     public void sendGameUpdate(Cell[][] cells, int turnPlayerId, PlayerData[] playerData) {
         try {
-            output.writeObject(ServerToClientEnum.GAME_UPDATE.name());
-            output.writeInt(turnPlayerId);
-            output.writeInt(playerData[0].getCurrentScore());
-            output.writeInt(playerData[0].getNbRoundWin());
-            output.writeInt(playerData[1].getCurrentScore());
-            output.writeInt(playerData[1].getNbRoundWin());
+            serverOutput.writeObject(ServerToClientEnum.GAME_UPDATE.name());
+            serverOutput.writeInt(turnPlayerId);
+            serverOutput.writeInt(playerData[0].getCurrentScore());
+            serverOutput.writeInt(playerData[0].getNbRoundWin());
+            serverOutput.writeInt(playerData[1].getCurrentScore());
+            serverOutput.writeInt(playerData[1].getNbRoundWin());
 
             for (var line = 0; line < Round.NB_LINE; ++line) {
                 for (var col = 0; col < Round.NB_COL; ++col) {
-                    output.writeInt(line);
-                    output.writeInt(col);
-                    output.writeInt(cells[line][col].getNbSeed());
+                    serverOutput.writeInt(line);
+                    serverOutput.writeInt(col);
+                    serverOutput.writeInt(cells[line][col].getNbSeed());
                 }
             }
-            output.flush();
+            serverOutput.flush();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -158,11 +162,12 @@ public class Player {
         return isPlayerOne ? 0 : 1;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        var player = (Player) o;
+        var player = (ServerPlayer) o;
         return this.isPlayerOne == player.isPlayerOne;
     }
 

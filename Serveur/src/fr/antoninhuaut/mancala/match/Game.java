@@ -1,7 +1,7 @@
 package fr.antoninhuaut.mancala.match;
 
 import fr.antoninhuaut.mancala.model.PlayerData;
-import fr.antoninhuaut.mancala.socket.Player;
+import fr.antoninhuaut.mancala.socket.player.ServerPlayer;
 import fr.antoninhuaut.mancala.socket.Session;
 import fr.antoninhuaut.mancala.socket.cenum.ServerToClientEnum;
 
@@ -64,19 +64,19 @@ public class Game implements Serializable {
             winnerId = -1;
         }
 
-        for (Player p : session.getNoNullPlayers()) {
+        for (ServerPlayer p : session.getNoNullPlayers()) {
             p.sendData(ServerToClientEnum.END_GAME, "" + winnerId);
         }
     }
 
     public void forceStopMatch() {
-        for (Player pLoop : session.getNoNullPlayers()) {
+        for (ServerPlayer pLoop : session.getNoNullPlayers()) {
             pLoop.sendData(ServerToClientEnum.MESSAGE, ServerToClientEnum.MessageEnum.STOP_MATCH.name());
         }
         endGame();
     }
 
-    public synchronized void addPlayer(Player p) {
+    public synchronized void addPlayer(ServerPlayer p) {
         p.gameSetup();
         sendGlobalUpdate();
     }
@@ -95,7 +95,7 @@ public class Game implements Serializable {
 
         var nbPlayer = session.getNbPlayer();
         if (nbPlayer == 1) {
-            for (Player pLoop : session.getNoNullPlayers()) {
+            for (ServerPlayer pLoop : session.getNoNullPlayers()) {
                 pLoop.sendData(ServerToClientEnum.WAIT_OPPONENT);
             }
         } else if (nbPlayer == 2) {
@@ -106,7 +106,7 @@ public class Game implements Serializable {
     }
 
     public synchronized void removePlayer() {
-        for (Player pLoop : session.getNoNullPlayers()) {
+        for (ServerPlayer pLoop : session.getNoNullPlayers()) {
             pLoop.sendData(ServerToClientEnum.WAIT_OPPONENT);
         }
     }
