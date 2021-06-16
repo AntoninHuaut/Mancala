@@ -110,7 +110,7 @@ public class GameController extends FXController {
 
             if (gameData.getBols()[i] == null) {
                 gameData.getBols()[i] = new SimpleDoubleProperty();
-                gameData.getBols()[i].set(random.nextDouble() * 180);
+                gameData.getBols()[i].set(random.nextDouble() * 360);
             }
 
             bol.rotateProperty().bind(gameData.getBols()[i]);

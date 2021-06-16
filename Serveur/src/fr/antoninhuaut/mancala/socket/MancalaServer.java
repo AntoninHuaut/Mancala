@@ -48,12 +48,14 @@ public class MancalaServer {
     public static void main(String[] args) throws Exception {
         var port = 3010;
 
-        if (args.length > 1) {
+        if (args.length >= 1) {
             try {
                 port = Integer.parseInt(args[0]);
             } catch (NumberFormatException ex) {
-                LOGGER.error("Invalid number");
+                LOGGER.error("Custom port: Invalid number, using default port");
             }
+        } else {
+            LOGGER.debug("No port specified: use the default port");
         }
 
         new MancalaServer(port);
