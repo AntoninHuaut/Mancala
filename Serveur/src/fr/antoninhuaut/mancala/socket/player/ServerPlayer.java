@@ -34,6 +34,27 @@ public class ServerPlayer {
         this.serverOutput = new ObjectOutputStream(serverSocket.getOutputStream());
     }
 
+    public String waitSessionId() throws IOException, ClassNotFoundException {
+        try {
+            String inputData = (String) serverInput.readObject();
+            String[] arguments = inputData.split(" ");
+            LOGGER.debug("SessionId: {}", inputData);
+
+            var clientCommand = ClientToServerEnum.extractFromCommand(arguments[0]);
+            if (clientCommand == ClientToServerEnum.CLIENT_SESSION) {
+                var sessionId = arguments[1];
+                sessionId = sessionId == null || sessionId.isEmpty() || sessionId.isBlank()
+                        || sessionId.equalsIgnoreCase("null")
+                        ? null : sessionId.toUpperCase();
+
+                LOGGER.debug("Converted sessionId: {}", sessionId);
+                return sessionId;
+            }
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException ignored) {
+        }
+        return null;
+    }
+
     public void waitSessionSetup(Session session, boolean isPlayerOne) throws IOException, ClassNotFoundException {
         this.session = session;
         this.isPlayerOne = isPlayerOne;
@@ -41,10 +62,10 @@ public class ServerPlayer {
         try {
             String inputData = (String) serverInput.readObject();
             String[] arguments = inputData.split(" ");
-            LOGGER.debug("SETUP: {}", inputData);
+            LOGGER.debug("SessionSetup: {}", inputData);
 
             var clientCommand = ClientToServerEnum.extractFromCommand(arguments[0]);
-            if (clientCommand == ClientToServerEnum.CLIENT_INIT) {
+            if (clientCommand == ClientToServerEnum.CLIENT_NAME) {
                 this.session.setPlayerName(getPlayerId(), arguments[1]);
             }
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException ignored) {

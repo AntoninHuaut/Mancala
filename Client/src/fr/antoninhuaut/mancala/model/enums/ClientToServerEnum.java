@@ -2,7 +2,8 @@ package fr.antoninhuaut.mancala.model.enums;
 
 public enum ClientToServerEnum {
 
-    CLIENT_INIT,
+    CLIENT_SESSION,
+    CLIENT_NAME,
     PLAY_WITH_BOT,
     MOVE,
 

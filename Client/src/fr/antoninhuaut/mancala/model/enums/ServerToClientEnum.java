@@ -3,6 +3,7 @@ package fr.antoninhuaut.mancala.model.enums;
 public enum ServerToClientEnum {
 
     WELCOME,
+    SESSION_FULL,
     INIT_PLAYER,
     WAIT_OPPONENT,
     GAME_UPDATE,

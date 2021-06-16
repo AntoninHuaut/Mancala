@@ -44,7 +44,8 @@ public class MancalaSocket {
         this.username = socketConnectionData.getUsername();
         this.homeView = homeView;
 
-        sendData(ClientToServerEnum.CLIENT_INIT, socketConnectionData.getUsername());
+        sendData(ClientToServerEnum.CLIENT_SESSION, socketConnectionData.getSessionId());
+        sendData(ClientToServerEnum.CLIENT_NAME, socketConnectionData.getUsername());
         this.homeView.getController().setMancalaSocket(this);
     }
 
@@ -73,6 +74,9 @@ public class MancalaSocket {
             case WELCOME:
                 this.sessionId = args[2];
                 fx(() -> gameController.initWelcome(args[1]));
+                break;
+            case SESSION_FULL:
+                fx(() -> new GenericAlert(Alert.AlertType.INFORMATION, "socket.socketconnection.full").showAndWait());
                 break;
             case INIT_PLAYER:
                 final var isYourTurn = args[1].equals("YOU");

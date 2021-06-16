@@ -35,12 +35,12 @@ public class Session {
     private ServerPlayer pOne;
     private ServerPlayer pTwo;
 
-    public Session() {
+    public Session(String sessionId) {
         for (var i = 0; i < playersData.length; i++) {
             playersData[i] = new PlayerData(i);
         }
 
-        this.sessionId = generateSessionId();
+        this.sessionId = sessionId == null ? generateSessionId() : sessionId;
         this.game = new Game().init(this);
         this.game.nextRound();
     }
@@ -66,7 +66,7 @@ public class Session {
 
             if (strategy == null) return;
 
-            server.getPool().execute(new ClientBotPlayer(strategy, server.getPort()));
+            server.getPool().execute(new ClientBotPlayer(strategy, getSessionId(), server.getPort()));
         } catch (IOException ignored) {
         }
     }

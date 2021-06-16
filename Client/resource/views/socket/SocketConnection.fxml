@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="700.0" stylesheets="@../GlobalButton.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="600.0" prefWidth="700.0" stylesheets="@../GlobalButton.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <GridPane layoutX="230.0" layoutY="155.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <columnConstraints>
@@ -71,7 +71,7 @@
                                           </HBox>
                                        </children>
                                     </VBox>
-                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="400.0">
+                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="400.0" spacing="10.0">
                                        <children>
                                           <Label text="%socket.socketconnection.form">
                                              <font>
@@ -94,6 +94,18 @@
                                                    <font>
                                                       <Font size="16.0" />
                                                    </font>
+                                                </TextField>
+                                             </children>
+                                          </HBox>
+                                          <HBox alignment="CENTER">
+                                             <children>
+                                                <TextField fx:id="sessionIdField" promptText="%socket.socketconnection.form.sessionid.prompt" HBox.hgrow="ALWAYS">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                   <HBox.margin>
+                                                      <Insets left="30.0" right="30.0" />
+                                                   </HBox.margin>
                                                 </TextField>
                                              </children>
                                           </HBox>

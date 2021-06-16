@@ -2,7 +2,8 @@ package fr.antoninhuaut.mancala.socket.cenum;
 
 public enum ClientToServerEnum {
 
-    CLIENT_INIT,
+    CLIENT_SESSION,
+    CLIENT_NAME,
     PLAY_WITH_BOT,
     MOVE,
 

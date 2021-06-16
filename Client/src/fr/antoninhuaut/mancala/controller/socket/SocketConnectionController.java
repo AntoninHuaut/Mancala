@@ -7,6 +7,7 @@ import fr.antoninhuaut.mancala.model.views.socket.SocketConnectionModel;
 import fr.antoninhuaut.mancala.utils.PreferenceUtils;
 import fr.antoninhuaut.mancala.utils.form.misc.StringNumberConverter;
 import fr.antoninhuaut.mancala.utils.form.validator.IntegerTextField;
+import fr.antoninhuaut.mancala.utils.form.validator.LimitSizeTextField;
 import fr.antoninhuaut.mancala.utils.form.validator.NoSpaceTextField;
 import fr.antoninhuaut.mancala.view.game.GameView;
 import fr.antoninhuaut.mancala.view.global.HomeView;
@@ -30,7 +31,7 @@ public class SocketConnectionController extends FXController {
     private Button connectBtn;
 
     @FXML
-    private TextField usernameField, hostField, portField;
+    private TextField usernameField, hostField, portField, sessionIdField;
 
     @FXML
     private Label errorMsg;
@@ -52,6 +53,7 @@ public class SocketConnectionController extends FXController {
         usernameField.disableProperty().bind(loadSpinProp);
         hostField.disableProperty().bind(loadSpinProp);
         portField.disableProperty().bind(loadSpinProp);
+        sessionIdField.disableProperty().bind(loadSpinProp);
 
         errorMsg.visibleProperty().bind(socketConnectionModel.errorMsgVisibilityProperty());
 
@@ -60,11 +62,15 @@ public class SocketConnectionController extends FXController {
         hostField.textProperty().bindBidirectional(socketConnectionData.hostProperty());
         hostField.textProperty().addListener((ev) -> setErrorMsgVisibility(false));
         portField.textProperty().addListener((ev) -> setErrorMsgVisibility(false));
+        sessionIdField.textProperty().bindBidirectional(socketConnectionData.sessionIdProperty());
+        sessionIdField.textProperty().addListener((ev) -> setErrorMsgVisibility(false));
         Bindings.bindBidirectional(portField.textProperty(), socketConnectionData.portProperty(), new StringNumberConverter());
 
         new NoSpaceTextField(hostField).apply();
         new NoSpaceTextField(usernameField).apply();
+        new NoSpaceTextField(sessionIdField).apply();
         new IntegerTextField(portField).apply();
+        new LimitSizeTextField(sessionIdField, 16).apply();
     }
 
     @FXML

@@ -9,6 +9,7 @@ public class SocketConnectionData {
     private final SimpleStringProperty username = new SimpleStringProperty(PreferenceUtils.getInstance().getUsername());
     private final SimpleStringProperty host = new SimpleStringProperty(PreferenceUtils.getInstance().getSocketHost());
     private final SimpleIntegerProperty port = new SimpleIntegerProperty(PreferenceUtils.getInstance().getSocketPort());
+    private final SimpleStringProperty sessionId = new SimpleStringProperty();
 
     public String getHost() {
         return host.get();
@@ -18,8 +19,12 @@ public class SocketConnectionData {
         return host;
     }
 
-    public void setHost(String host) {
-        this.host.set(host);
+    public String getSessionId() {
+        return sessionId.get();
+    }
+
+    public SimpleStringProperty sessionIdProperty() {
+        return sessionId;
     }
 
     public int getPort() {
@@ -28,10 +33,6 @@ public class SocketConnectionData {
 
     public SimpleIntegerProperty portProperty() {
         return port;
-    }
-
-    public void setPort(int port) {
-        this.port.set(port);
     }
 
     public String getUsername() {

@@ -29,14 +29,15 @@ public class ClientBotPlayer implements Runnable {
     private int myPlayerId;
     private Cell[][] cells;
 
-    public ClientBotPlayer(Strategy strategy, int port) throws IOException {
+    public ClientBotPlayer(Strategy strategy, String sessionId, int port) throws IOException {
         this.strategy = strategy;
         this.clientSocket = createClientSocket(port);
         this.clientOutput = new ObjectOutputStream(clientSocket.getOutputStream());
         this.clientInput = new ObjectInputStream(clientSocket.getInputStream());
 
         var username = "Bot" + (new Random().nextInt(899) + 100);
-        sendData(ClientToServerEnum.CLIENT_INIT, username);
+        sendData(ClientToServerEnum.CLIENT_SESSION, sessionId);
+        sendData(ClientToServerEnum.CLIENT_NAME, username);
     }
 
     @Override
