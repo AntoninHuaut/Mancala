@@ -73,7 +73,7 @@ public class MancalaSocket {
         switch (sEnum) {
             case WELCOME:
                 this.sessionId = args[2];
-                fx(() -> gameController.initWelcome(args[1]));
+                fx(() -> gameController.initWelcome(args[1], sessionId));
                 break;
             case SESSION_FULL:
                 fx(() -> new GenericAlert(Alert.AlertType.INFORMATION, "socket.socketconnection.full").showAndWait());

@@ -43,7 +43,7 @@ public class GameController extends FXController {
     private final MancalaSocket mancalaSocket;
 
     @FXML
-    public Label infosLabel, errorLabel;
+    public Label infosLabel, sessionIdLabel, errorLabel;
 
     @FXML
     public GridPane gameGrid;
@@ -150,6 +150,7 @@ public class GameController extends FXController {
         gameGrid.visibleProperty().bind(gameData.gameGridVisibilityProperty());
         errorLabel.visibleProperty().bind(gameData.errorLabelVisibilityProperty());
         infosLabel.textFillProperty().bind(gameData.infosLabelColorProperty());
+        sessionIdLabel.textProperty().bind(gameData.sessionIdLabelTextProperty());
 
         if (gameData.infosLabelTextProperty() != null) {
             infosLabel.textProperty().bind(gameData.infosLabelTextProperty());
@@ -233,7 +234,8 @@ public class GameController extends FXController {
         cancelTimerTask();
     }
 
-    public void initWelcome(String playerNumberResponse) {
+    public void initWelcome(String playerNumberResponse, String sessionId) {
+        gameData.sessionIdLabelTextProperty().set(sessionId);
         boolean isPlayerOne = playerNumberResponse.equalsIgnoreCase("player_one");
         if (isPlayerOne) {
             this.myPlayerId = 0;

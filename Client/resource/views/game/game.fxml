@@ -54,6 +54,18 @@
             <children>
                 <VBox alignment="CENTER" prefHeight="100.0" prefWidth="700.0" spacing="5.0">
                     <children>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="sessionIdLabel" alignment="CENTER" text="SessionId" wrapText="true">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <VBox.margin>
+                        <Insets left="15.0" top="-15.0" />
+                     </VBox.margin>
+                  </HBox>
                         <Label fx:id="infosLabel" alignment="CENTER" text="Information message" wrapText="true">
                             <font>
                                 <Font size="22.0" />
