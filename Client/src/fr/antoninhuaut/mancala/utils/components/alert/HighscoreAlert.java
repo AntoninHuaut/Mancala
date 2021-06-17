@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 public class HighscoreAlert extends GenericAlert {
 
+    private static final String SEPARATOR = "" + '\n';
     private static final String KEY = "home.highscore";
 
     public HighscoreAlert(String highscore) {
@@ -38,7 +39,7 @@ public class HighscoreAlert extends GenericAlert {
     }
 
     private String formatHighscore(String highscore) {
-        var listHS = Arrays.stream(highscore.split(System.getProperty("line.separator"))).map(el -> {
+        var listHS = Arrays.stream(highscore.split(SEPARATOR)).map(el -> {
             try {
                 return new Highscore(el);
             } catch (IllegalStateException ignore) {
@@ -46,7 +47,7 @@ public class HighscoreAlert extends GenericAlert {
             }
         }).filter(Objects::nonNull).collect(Collectors.toList());
         var listStr = listHS.stream().map(high -> I18NUtils.getInstance().get("home.highscore.format", high.getUsername(), high.getNbSeed())).collect(Collectors.toList());
-        return listStr.stream().collect(Collectors.joining(System.getProperty("line.separator")));
+        return String.join(SEPARATOR, listStr);
     }
 
     static class Highscore {

@@ -2,6 +2,7 @@ package fr.antoninhuaut.mancala.save;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 
 public class HighscoreManager {
 
+    private static final String SEPARATOR = "" + '\n';
     private static final int RECORD_LIMIT = 100;
     private static HighscoreManager instance;
 
@@ -31,13 +33,13 @@ public class HighscoreManager {
     }
 
     public String serializeHighscoreList(List<Highscore> highscores) {
-        return highscores.stream().map(Highscore::toString).collect(Collectors.joining(System.getProperty("line.separator")));
+        return highscores.stream().map(Highscore::toString).collect(Collectors.joining(SEPARATOR));
     }
 
     public List<Highscore> getHighscores() {
         List<Highscore> lines = new ArrayList<>();
         try {
-            List<String> strList = Files.readAllLines(highscoreFile.toPath());
+            List<String> strList = Files.readAllLines(highscoreFile.toPath(), StandardCharsets.UTF_8);
             strList.forEach(str -> lines.add(new Highscore(str)));
         } catch (IOException ex) {
             ex.printStackTrace();
