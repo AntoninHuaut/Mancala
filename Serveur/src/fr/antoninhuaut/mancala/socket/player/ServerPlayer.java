@@ -178,6 +178,13 @@ public class ServerPlayer {
         }
     }
 
+    public void disconnect() {
+        try {
+            serverSocket.close();
+        } catch (IOException ignored) {
+        }
+    }
+
     public int getPlayerId() {
         return isPlayerOne ? 0 : 1;
     }

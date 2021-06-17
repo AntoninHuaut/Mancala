@@ -21,6 +21,8 @@ public enum ServerToClientEnum {
     ASK_TO_SURRENDER,
     RESPONSE_HIGHSCORE,
 
+    AUTO_DESTRUCTION,
+
     UNKNOWN;
 
     public static ServerToClientEnum extractFromCommand(String data) {

@@ -78,6 +78,9 @@ public class MancalaSocket {
             case SESSION_FULL:
                 fx(() -> new GenericAlert(Alert.AlertType.INFORMATION, "socket.socketconnection.full").showAndWait());
                 break;
+            case AUTO_DESTRUCTION:
+                fx(() -> new GenericAlert(Alert.AlertType.INFORMATION, "game.auto_destruction").showAndWait());
+                break;
             case INIT_PLAYER:
                 final var isYourTurn = args[1].equals("YOU");
                 fx(() -> gameController.initPostPlayerJoin(isYourTurn));

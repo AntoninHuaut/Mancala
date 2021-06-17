@@ -14,10 +14,7 @@ import fr.antoninhuaut.mancala.socket.player.bot.RandomStrategy;
 import fr.antoninhuaut.mancala.socket.player.bot.Strategy;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,15 +22,19 @@ public class Session {
 
     private static final Random random = new Random();
     private static final int SESSION_ID_LENGTH = 5;
+    private static final long DELAY_AUTO_DESTRUCTION = 5L * 60L * 1000L;
 
     private final String sessionId;
+
+    private final Timer timer = new Timer();
+    private TimerTask timerTask;
 
     private final PlayerData[] playersData = new PlayerData[2];
 
     private Game game;
-
     private ServerPlayer pOne;
     private ServerPlayer pTwo;
+
 
     public Session(String sessionId) {
         for (var i = 0; i < playersData.length; i++) {
@@ -72,7 +73,13 @@ public class Session {
     }
 
     public void addPlayer(ServerPlayer p) throws IOException, ClassNotFoundException {
-        if (getNbPlayer() >= 2) return;
+        var nbPlayer = getNbPlayer();
+        if (nbPlayer >= 2) return;
+        if (nbPlayer == 0) {
+            scheduleAutoDestruction();
+        } else {
+            cancelAutoDestruction();
+        }
 
         boolean isPlayerOne;
 
@@ -97,14 +104,38 @@ public class Session {
 
         game.removePlayer();
 
-        if (getNbPlayer() == 0) {
+        var nbPlayer = getNbPlayer();
+        if (nbPlayer == 0) {
             SessionHandler.destroySession(this);
+        } else if (nbPlayer == 1) {
+            scheduleAutoDestruction();
         }
     }
 
     public void stopAndStartNewGame() {
         stopGame();
         reLaunchGame(new Game(), ServerToClientEnum.MessageEnum.NEW_MATCH);
+    }
+
+    private void cancelAutoDestruction() {
+        if (timerTask != null) {
+            timerTask.cancel();
+        }
+    }
+
+    private void scheduleAutoDestruction() {
+        cancelAutoDestruction();
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                for (ServerPlayer p :getNoNullPlayers()) {
+                    p.sendData(ServerToClientEnum.AUTO_DESTRUCTION);
+                    p.disconnect();
+                }
+                SessionHandler.destroySession(Session.this);
+            }
+        };
+        timer.schedule(timerTask, DELAY_AUTO_DESTRUCTION);
     }
 
     private void stopGame() {
